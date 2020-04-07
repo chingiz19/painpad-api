@@ -47,23 +47,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //handle api endpoints
-app.use(`/`, require('./Source/api/init'));
+app.use('/', require('./Source/api/init'));
 
 //if nothing exists then 404
 app.use(function (req, res, next) {
     res.status(404);
-
-    res.format({
-        html: () => {
-            console.log(`${req.baseUrl} not found type -> html`);
-            res.sendFile('./www/html/404.html', { root: './' });
-        },
-        json: function () {
-            Logger.sendError(req, res, `${req.baseUrl} API endpoint does not exist`);
-        },
-        default: function () {
-            console.log('not found type -> text');
-            res.type('txt').send('Not found')
-        }
-    })
+    return Logger.sendError(req, res, `${req.baseUrl} API endpoint does not exist`);
 });

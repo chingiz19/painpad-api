@@ -70,7 +70,7 @@ router.post('/signUp', async function (req, res) {
     return Logger.sendSuccess(req, res);
 });
 
-router.get('/signout', Auth.isUserAuthorised, function (req, res) {
+router.get('/signOut', Auth.isUserAuthorised, function (req, res) {
     Logger.debug(`Signing user`, req.user, 'out...');
     
     delete req.session.user;
