@@ -45,7 +45,7 @@ function sendSuccess(req, res, inData = {}, inMessage = 'Success!', inDevMessage
         devMessage: inDevMessage
     }
 
-    Logger.debug('API success => ', req.baseUrl, inMessage); //JSON.stringify(inData)
+    debug('API success => ', req.baseUrl, inMessage); //JSON.stringify(inData)
 
     return res.send(responseObject);
 }

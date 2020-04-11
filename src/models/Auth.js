@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const Logger = require('./models/Logger');
 
 async function generatePassHashAndSalt(plain) {
     return await bcrypt.hash(plain, 256);

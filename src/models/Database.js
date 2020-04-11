@@ -9,6 +9,8 @@
  * https://stackoverflow.com/questions/20712291/use-node-postgres-to-get-postgres-timestamp-without-timezone-in-utc
  */
 const pg = require('pg');
+const Logger = require('./Logger');
+
 const Client = pg.Client;
 let types = pg.types;
 

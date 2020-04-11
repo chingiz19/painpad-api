@@ -1,0 +1,26 @@
+type Query {
+  isLogin: Boolean!
+}
+
+type Mutation {
+  login(username: String!, pwd: String!): Boolean!
+  signup(username: String!, pwd: String!): Boolean!
+}
+
+type Subscription {
+  newPost: Post
+}
+
+type Post {
+  id: ID!,
+  descrption: String!,
+  postedBy: User!
+}
+
+type User {
+  id: ID!,
+  firstName: String!,
+  lastName: String!,
+  username: String!,
+  score: Int!
+}

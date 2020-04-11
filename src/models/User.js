@@ -1,3 +1,4 @@
+const DB = require('./Database');
 
 async function getUserInformationByEmail() {
     let query = ``;
@@ -9,7 +10,7 @@ async function getUserInformationByEmail() {
             return result.rows;
         }
     } catch (error) {
-        console.error('Error => db.updateValuesInTable()', error.message);
+        console.error('Error @ User.getUserInformationByEmail()', error.message);
     }
 
     return false;
