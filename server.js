@@ -52,7 +52,7 @@ let options = {
   playground: "/playground",
   cors: {
     credentials: true,
-    origin: [`http://localhost:${port}`, 'http://painpad.co', 'https://painpad.co']
+    origin: [`http://localhost:${port}`, 'http://api.painpad.co']
   },
   port
 };
