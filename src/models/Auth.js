@@ -1,20 +1,18 @@
 const bcrypt = require('bcrypt');
-const Logger = require('./models/Logger');
 
-async function generatePassHashAndSalt(plain) {
+const USER_LEVEL = 2;
+const ERROR_NOT_AUTH = 'Not authorized';
+
+async function generatePassHash(plain) {
     return await bcrypt.hash(plain, 256);
 }
 
-function isUserAuthorised(req, res, next) {
-    return isAuthorised(req, res, next)
+async function comparePasswords(plain, hash) {
+    return await bcrypt.compare(plain, hash)
+}
+
+function isUserAuthorised(req) {
+    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL;
 };
 
-module.exports = { generatePassHashAndSalt, isUserAuthorised }
-
-function isAuthorised(req, res, next) {
-    if (req.session && req.session.user) {
-        next();
-    } else {
-        Logger.sendError(req, res, `not authorized`);
-    }
-}
+module.exports = { ERROR_NOT_AUTH, generatePassHash, isUserAuthorised, comparePasswords }

@@ -34,8 +34,8 @@ connection.connect((err) => {
         console.error('Error while connecting to', database, err.stack);
         return Logger.exit();
     }
-    
-    Logger.debug(`Connected to 127.0.0.1:${database}`);
+
+    Logger.debug(`Connected to ${database} on 127.0.0.1`);
 });
 
 async function query(inQuery, params = undefined) {
@@ -356,4 +356,23 @@ async function selectFromWhere(fromTable, columns, inWhere, groupBy) {
     return false;
 }
 
-module.exports = { query, insertValuesIntoTable, dropTable, updateValuesInTable, selectFrom, selectFromWhere, deleteFromWhere }
+function whereObj(attribute, operator, value, useRaw = false) {
+    return { attribute, operator, value, useRaw }
+}
+
+async function incubate(inQuery, params = undefined, rowCount = false) {
+    try {
+        let result = await query(inQuery, params);
+
+        if (result && ((!rowCount && result.rows) ||
+            (rowCount && result.rowCount > 0))) {
+            return result.rows;
+        }
+    } catch (error) {
+        console.error('DB Error ->', error.message);
+    }
+
+    return false;
+}
+
+module.exports = { query, insertValuesIntoTable, dropTable, updateValuesInTable, selectFrom, selectFromWhere, deleteFromWhere, whereObj, incubate }

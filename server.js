@@ -8,6 +8,7 @@ const redisClient = redis.createClient();
 const RedisStore = require("connect-redis")(session);
 
 const port = process.env.SERVER_PORT;
+const maxAge = process.env.COOKIE_MAX_AGE;
 
 let sessionStoreOptions = {
   host: process.env.REDIS_HOST,
@@ -16,22 +17,21 @@ let sessionStoreOptions = {
   pass: process.env.REDIS_PASS,
   client: redisClient,
   logErrors: true,
-  ttl: ms("7d"),
+  ttl: ms(`${maxAge}d`)
 };
 
 let sessionOptions = {
-  name: "painpad.id",
+  name: "painpad",
   store: new RedisStore(sessionStoreOptions),
   secret: process.env.SESSION_SECRET_KEY,
   resave: true,
   rolling: true,
   saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === "production", //TODO: change .env file on prod accordingly
+    maxAge: ms(`${maxAge}d`),
+  }
 };
-
-// context
-const context = (req) => ({
-  req: req.request,
-});
 
 // GraphQL Server options
 const server = new GraphQLServer({
@@ -39,23 +39,63 @@ const server = new GraphQLServer({
   resolvers: {
     Query: require("./src/resolvers/query"),
     Mutation: require("./src/resolvers/mutation"),
+    Subscription: require("./src/resolvers/subscription"),
   },
-  context,
+  context: ({ request, connection }) => {
+    let binder;
+
+    if (request) {
+      binder = request;
+    } else if (connection && connection.context && connection.context.request) {
+      binder = connection.context.request;
+      console.log('Going through context');
+    }
+
+    // console.log('Sending context req with session', binder.sessionID);
+
+    return { req: binder };
+  }
 });
 
-server.express.use(session(sessionOptions));
+let sessionMiddleWare = session(sessionOptions);
+
+server.express.use(sessionMiddleWare);
 
 //Apollo Server options
 let options = {
+  port,
   endpoint: "/graphql",
-  subscriptions: "/subscriptions",
   playground: "/playground",
+  subscriptions: {
+    path: "/subscriptions",
+    onConnect: async (connectionParams, webSocket) => {
+      try {
+        const promise = new Promise((resolve, reject) => {
+          sessionMiddleWare(webSocket.upgradeReq, {}, () => {
+            resolve(webSocket.upgradeReq.session);
+          });
+        });
+
+        const session = await promise;
+
+        return { request: session.req };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+  },
   cors: {
     credentials: true,
-    origin: [`http://localhost:${port}`, 'http://api.painpad.co']
-  },
-  port
+    origin: [
+      "http://localhost:8080",
+      "http://localhost:3000",
+      "http://api.painpad.co"
+    ]
+  }
 };
+
+//DB connection
+global.DB = require('./src/models/Database');
 
 // start server
 server.start(options, ({ port }) =>

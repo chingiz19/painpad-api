@@ -1,26 +1,91 @@
 type Query {
   isLogin: Boolean!
+  locations(text: String!, limit: Int!): [Pair!]!
+  industries(text: String!, limit: Int!): [Pair!]!
+  occupations(text: String!, limit: Int!): [Pair!]!
+  signin(email: String!, pwd: String!): Boolean!
+  userProfile(userId: ID!): Profile!,
+  signout: Boolean!
 }
 
 type Mutation {
-  login(username: String!, pwd: String!): Boolean!
-  signup(username: String!, pwd: String!): Boolean!
+  signup(
+    firstName: String!
+    lastName: String!
+    email: String!
+    pwd: String!
+    cityId: ID!
+    industryId: ID!
+  ): Boolean!
 }
 
 type Subscription {
   newPost: Post
+  notification: Notification
+  sameHere(postId: ID!): ID!
+}
+
+type Topic {
+  id: ID!
+  name: String!
+}
+
+type subTopic {
+  id: ID!
+  name: String!
+  topicId: ID!
 }
 
 type Post {
-  id: ID!,
-  descrption: String!,
-  postedBy: User!
+  id: ID!
+  descrption: String!
+  postedBy: shortUser
+  created: Float!
+  approved: Float!
+  industry: String!
+  location: String!
+  subTopic: subTopic!
 }
 
 type User {
-  id: ID!,
-  firstName: String!,
-  lastName: String!,
-  username: String!,
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
   score: Int!
+  emailVerified: Boolean!
+  profilePic: String!
+  occupation: String
+  industry: String!
+  location: String!
+  since: Float!
+  posts: [Post]!
+  followers: [shortUser]!
+  following: [shortUser]!
+}
+
+type Notification {
+  id: ID!
+  descrption: String!
+  created: Float!
+  icon: String!
+}
+
+type shortUser {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  profilePic: String!
+  industry: String!
+  occupation: String
+}
+
+type Pair {
+  id: ID!
+  value: String!
+}
+
+type Profile {
+  self: Boolean!
+  user: User!
 }
