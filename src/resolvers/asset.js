@@ -1,7 +1,7 @@
 const Auth = require('../models/Auth');
 
 async function getLocations(parent, args, { req }) {
-    let params = [args.text, args.limit];
+    let params = [args.text.toLowerCase(), args.limit];
 
     let query = `
     SELECT 
@@ -24,7 +24,7 @@ async function getLocations(parent, args, { req }) {
 async function getOccupations(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Error(Auth.ERROR_NOT_AUTH);
 
-    let params = [args.text, args.limit];
+    let params = [args.text.toLowerCase(), args.limit];
 
     let query = `
     SELECT 
@@ -43,7 +43,7 @@ async function getOccupations(parent, args, { req }) {
 }
 
 async function getIndustries(parent, args, { req }) {
-    let params = [args.text, args.limit];
+    let params = [args.text.toLowerCase(), args.limit];
 
     let query = `
     SELECT 
