@@ -5,13 +5,13 @@ async function getLocations(parent, args, { req }) {
 
     let query = `
     SELECT 
-        cities.id, cities.name || ', ' || states.name AS value
+        cities.id, cities.name || ', ' || countries.name AS value
     FROM 
         cities
-    INNER JOIN 
-        states USING(id)
+    INNER JOIN states USING(id)
+    INNER JOIN countries ON states.country_id = countries.id
     WHERE
-        cities.name  LIKE ($1 || '%')
+        LOWER(cities.name) LIKE ($1 || '%')
     LIMIT $2;`;
 
     let result = await DB.incubate(query, params);
@@ -32,7 +32,7 @@ async function getOccupations(parent, args, { req }) {
     FROM 
 	    occupations
     WHERE
-        name  LIKE ($1 || '%')
+        LOWER(name)  LIKE ($1 || '%')
     LIMIT $2;`;
 
     let result = await DB.incubate(query, params);
@@ -51,7 +51,7 @@ async function getIndustries(parent, args, { req }) {
     FROM 
 	    industries
     WHERE
-        name  LIKE ($1 || '%')
+        LOWER(name)  LIKE ($1 || '%')
     LIMIT $2;`;
 
     let result = await DB.incubate(query, params);
