@@ -51,7 +51,7 @@ const server = new GraphQLServer({
       console.log('Going through context');
     }
 
-    // console.log('Sending context req with session', binder.sessionID);
+    console.log('Sending context req with session', binder.sessionID);
 
     return { req: binder };
   }
