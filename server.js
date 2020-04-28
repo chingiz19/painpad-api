@@ -27,10 +27,10 @@ let sessionOptions = {
   resave: true,
   rolling: true,
   saveUninitialized: true,
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    maxAge: ms(`${maxAge}d`),
-  }
+  // cookie: {
+  //   secure: process.env.NODE_ENV === "production",
+  //   maxAge: ms(`${maxAge}d`),
+  // }
 };
 
 // GraphQL Server options
