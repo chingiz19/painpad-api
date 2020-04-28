@@ -12,7 +12,7 @@ async function comparePasswords(plain, hash) {
 }
 
 function isUserAuthorised(req) {
-    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL;
+    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL ? true : false;
 };
 
 module.exports = { ERROR_NOT_AUTH, generatePassHash, isUserAuthorised, comparePasswords }

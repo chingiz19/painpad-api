@@ -28,7 +28,7 @@ let sessionOptions = {
   rolling: true,
   saveUninitialized: true,
   cookie: {
-    secure: process.env.NODE_ENV === "production", //TODO: change .env file on prod accordingly
+    secure: process.env.NODE_ENV === "production",
     maxAge: ms(`${maxAge}d`),
   }
 };
