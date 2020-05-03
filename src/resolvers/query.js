@@ -9,5 +9,7 @@ module.exports = {
   occupations: Asset.getOccupations,
   signin: User.signin,
   userProfile: User.profile,
+  userStats: User.stats,
+  userPosts: User.posts,
   signout: User.signout
 };

@@ -4,7 +4,9 @@ type Query {
   industries(text: String!, limit: Int!): [Pair!]!
   occupations(text: String!, limit: Int!): [Pair!]!
   signin(email: String!, pwd: String!): Boolean!
-  userProfile(userId: ID!): Profile!,
+  userProfile(userId: ID!): Profile!
+  userStats(userId: ID!): UserStats!
+  userPosts(userId: ID!): [Post!]!
   signout: Boolean!
 }
 
@@ -36,15 +38,9 @@ type subTopic {
   topicId: ID!
 }
 
-type Post {
-  id: ID!
-  descrption: String!
-  postedBy: shortUser
-  created: Float!
-  approved: Float!
-  industry: String!
-  location: String!
-  subTopic: subTopic!
+type Profile {
+  self: Boolean!
+  user: User!
 }
 
 type User {
@@ -52,32 +48,38 @@ type User {
   firstName: String!
   lastName: String!
   email: String!
-  score: Int!
   emailVerified: Boolean!
   profilePic: String!
-  occupation: String
-  industry: String!
-  location: String!
+  occupation: Pair!
+  industry: Pair!
+  location: Pair!
   since: Float!
-  posts: [Post]!
-  followers: [shortUser]!
-  following: [shortUser]!
+  score: Int!
 }
 
-type Notification {
-  id: ID!
-  descrption: String!
-  created: Float!
-  icon: String!
+type UserStats {
+  following: [ShortUser]!
+  followers: [ShortUser]!
 }
 
-type shortUser {
+type ShortUser {
   id: ID!
-  first_name: String!
-  last_name: String!
+  firstName: String!
+  lastName: String!
   profilePic: String!
   industry: String!
   occupation: String
+}
+
+type Post {
+  id: ID!
+  descrption: String!
+  postedBy: ShortUser
+  created: Float!
+  approved: Float!
+  industry: String!
+  location: String!
+  subTopic: subTopic!
 }
 
 type Pair {
@@ -85,7 +87,9 @@ type Pair {
   value: String!
 }
 
-type Profile {
-  self: Boolean!
-  user: User!
+type Notification {
+  id: ID!
+  descrption: String!
+  created: Float!
+  icon: String!
 }

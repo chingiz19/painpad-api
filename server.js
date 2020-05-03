@@ -26,11 +26,7 @@ let sessionOptions = {
   secret: process.env.SESSION_SECRET_KEY,
   resave: true,
   rolling: true,
-  saveUninitialized: true,
-  // cookie: {
-  //   secure: process.env.NODE_ENV === "production",
-  //   maxAge: ms(`${maxAge}d`),
-  // }
+  saveUninitialized: true
 };
 
 // GraphQL Server options
@@ -51,7 +47,7 @@ const server = new GraphQLServer({
       console.log('Going through context');
     }
 
-    console.log('Sending context req with session', binder.sessionID);
+    // console.log('Sending context req with session', binder.sessionID);
 
     return { req: binder };
   }

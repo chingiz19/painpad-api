@@ -10,9 +10,9 @@ async function getUserInformation(userId) {
             'emailVerified', email_verified,
             'score', score,
             'profilePic', profile_pic,
-            'occupation', occupations.name,
-            'industry', industries.name,
-            'location', cities.name || ', ' || countries.name,
+            'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'not selected')),
+            'industry', json_build_object('id', industries.id, 'value', industries.name),
+            'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || countries.name),
             'since',  extract(epoch from since) * 1000
         ) AS info
     FROM users
@@ -58,4 +58,30 @@ async function getUserPosts(userId) {
     return result[0].posts || [];
 }
 
-module.exports = { getUserInformation, getUserPosts }
+async function getUserStats(userId, column) {
+    let query = `
+    SELECT 
+        json_agg(json_build_object('id', users.id,
+                                'firstName', users.first_name,
+                                'lastName', users.last_name,
+                                'profilePic', users.profile_pic,
+                                'industry', industries.name,
+                                'occupation', occupations.name 
+                                ))
+    FROM follows
+    INNER JOIN users ON users.id=follows.${column}
+    LEFT JOIN occupations ON users.occupation_id = occupations.id
+    INNER JOIN industries ON industry_id = industries.id
+    INNER JOIN cities ON city_id = cities.id
+    INNER JOIN states ON state_id = cities.state_id
+    INNER JOIN countries ON countries.id = states.country_id
+    WHERE user_id=${userId};`;
+
+    let result = await DB.incubate(query);
+
+    if (!result) return false;
+
+    return result[0].json_agg || [];
+}
+
+module.exports = { getUserInformation, getUserPosts, getUserStats }

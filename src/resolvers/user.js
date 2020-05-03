@@ -67,24 +67,27 @@ async function profile(parent, { userId }, { req }) {
 
     if (!userInfo) throw new Error(GENERIC_ERRROR);
 
+    return {
+        self: existingUserId === Number(userId),
+        user: userInfo
+    }
+}
+
+async function stats(parent, { userId }, { req }) {
+    let following = await User.getUserStats(userId, 'follows');
+    let followers = await User.getUserStats(userId, 'user_id');
+
+    if (!followers || !following) throw new Error(GENERIC_ERRROR);
+
+    return { following, followers }
+}
+
+async function posts(parent, { userId }, { req }) {  //TODO: needs verification
     let userPosts = await User.getUserPosts(userId);
 
     if (!userPosts) throw new Error(GENERIC_ERRROR);
 
-    let following = await DB.selectFromWhere('follows', ['array_agg(follows) AS following'], [DB.whereObj('user_id', '=', userId)]);
-
-    let followers = await DB.selectFromWhere('follows', ['array_agg(user_id) AS followers'], [DB.whereObj('follows', '=', userId)]);
-
-    if (!followers || !following) throw new Error(GENERIC_ERRROR);
-
-    userInfo.followers = followers[0].followers || [];
-    userInfo.following = following[0].following || [];
-    userInfo.posts = userPosts;
-
-    return {
-        self: existingUserId === Number(userId),
-        user: userInfo
-    };
+    return userPosts
 }
 
-module.exports = { signin, signup, profile, signout };
+module.exports = { signin, signup, profile, signout, posts, stats };
