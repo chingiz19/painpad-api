@@ -22,6 +22,7 @@
   },
   "homepage": "https://gitlab.com/knogeo/3dcre#readme",
   "dependencies": {
+    "aws-sdk": "^2.668.0",
     "bcrypt": "^4.0.1",
     "bcryptjs": "^2.4.3",
     "bourbon": "^6.0.0",

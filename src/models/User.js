@@ -4,8 +4,8 @@ async function getUserInformation(userId) {
     let query = `
     SELECT json_build_object(
             'id', users.id,
-            'firstName', initCap(first_name), 
-            'lastName', initCap(last_name),
+            'firstName', INITCAP(first_name), 
+            'lastName', INITCAP(last_name),
             'email', email,
             'emailVerified', email_verified,
             'score', score,
@@ -39,7 +39,7 @@ async function getUserPosts(userId) {
             'created', extract(epoch from posts.created) * 1000,
             'industry', INITCAP(industries.name),
             'approved', extract(epoch from posts.approved) * 1000,
-            'subTopic', json_build_object('id', subtopics.id, 'description', INITCAP(subtopics.name), 'topicId', topics.id),
+            'subTopic', json_build_object('id', subtopics.id, 'description', INITCAP(subtopics.name::text), 'topicId', topics.id),
             'location', cities.name || ', ' || countries.name
         )) AS posts
     FROM posts

@@ -8,6 +8,7 @@ type Query {
   userStats(userId: ID!): UserStats!
   userPosts(userId: ID!): [Post!]!
   signout: Boolean!
+  signS3(fileName: String!, fileType: String!): S3Response!
 }
 
 type Mutation {
@@ -91,6 +92,11 @@ type Notification {
 }
 
 type AuthRes {
-  success: Boolean,
+  success: Boolean
   id: ID!
+}
+
+type S3Response {
+  uploadUrl: String!
+  fileUrl: String!
 }

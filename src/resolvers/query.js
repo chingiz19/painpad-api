@@ -1,4 +1,5 @@
 const User = require('./user');
+const AWS = require('./aws');
 const Asset = require('./asset');
 const Auth = require('../models/Auth');
 
@@ -11,5 +12,6 @@ module.exports = {
   userProfile: User.profile,
   userStats: User.stats,
   userPosts: User.posts,
-  signout: User.signout
+  signout: User.signout,
+  signS3: AWS.signS3
 };
