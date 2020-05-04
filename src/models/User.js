@@ -96,7 +96,7 @@ async function changeUserProfile(userId, args) {
                 updates['last_name'] = value;
                 break;
             case 'locationId':
-                updates['location_id'] = value;
+                updates['city_id'] = value;
                 break;
             case 'occupationId':
                 updates['occupation_id'] = value;
