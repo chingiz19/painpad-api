@@ -112,9 +112,7 @@ async function changeUserProfile(userId, args) {
         }
     }
 
-    let result = await DB.updateValuesInTable('users', userId, updates);
-
-    return result && true;
+    return await DB.updateValuesInTable('users', userId, updates);
 }
 
 module.exports = { getUserInformation, getUserPosts, getUserStats, changeUserProfile }

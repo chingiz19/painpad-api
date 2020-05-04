@@ -53,8 +53,6 @@ async function signup(parent, { firstName, lastName, email, pwd, cityId, industr
 }
 
 async function signout(parent, args, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
-
     return req.session.destroy() && true;
 }
 
@@ -97,6 +95,8 @@ async function changeProfile(parent, args, { req }) {
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
+    req.session.user = result[0];
+
     return true
 }
 
@@ -106,7 +106,7 @@ async function follow(parent, { userIdToFollow }, { req }) {
     let userId = req.session.user.id;
 
     let insertData = {
-        user_id: userId, 
+        user_id: userId,
         follows: userIdToFollow
     }
 
@@ -124,16 +124,22 @@ async function changePassword(parent, { oldPwd, newPwd }, { req }) {
 
     let passwordHash = req.session.user.password_hash;
 
-    let compareResult = await Auth.comparePasswords(oldPwd, passwordHash);
+    let oldCompareResult = await Auth.comparePasswords(oldPwd, passwordHash);
 
-    if (!compareResult) throw new Error('Existing passwrod is incorrect');
-   
+    if (!oldCompareResult) throw new Error('Existing passwrod is incorrect');
+
+    let newCompareResult = await Auth.comparePasswords(newPwd, passwordHash);
+
+    if (newCompareResult) throw new Error('New passwrod can not be same as old');
+
     let userId = req.session.user.id;
-    let updateData = {password_hash : await Auth.generatePassHash(newPwd)}
+    let updateData = { password_hash: await Auth.generatePassHash(newPwd) }
 
     let result = await DB.updateValuesInTable(TABLE, userId, updateData);
 
     if (!result) throw new Error(GENERIC_ERRROR);
+
+    req.session.user = result[0];
 
     return true;
 }
