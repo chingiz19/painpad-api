@@ -1,7 +1,7 @@
 const Auth = require('../models/Auth');
 const User = require('../models/User');
 const TABLE = 'users';
-const GENERIC_ERRROR = 'Error while retrieving user info';
+const GENERIC_ERRROR = 'Unexpexted error occured while request';
 
 async function signin(parent, { email, pwd }, { req }) {
     if (Auth.isUserAuthorised(req)) throw new Error('Already signed in');
@@ -32,7 +32,7 @@ async function signup(parent, { firstName, lastName, email, pwd, cityId, industr
 
     let selectResult = await DB.selectFromWhere(TABLE, ['*'], [whereObj]);
 
-    if (selectResult) throw new Error('Hmm, seems like user already exists');
+    if (selectResult) throw new Error('Hmm, seems like user with this email already exists');
 
     let data = {
         first_name: firstName.toLowerCase(),
@@ -55,9 +55,7 @@ async function signup(parent, { firstName, lastName, email, pwd, cityId, industr
 async function signout(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
 
-    let result = req.session.destroy();
-
-    return true;
+    return req.session.destroy() && true;
 }
 
 async function profile(parent, { userId }, { req }) {
@@ -121,4 +119,23 @@ async function follow(parent, { userIdToFollow }, { req }) {
     return true
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow };
+async function changePassword(parent, { oldPwd, newPwd }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+
+    let passwordHash = req.session.user.password_hash;
+
+    let compareResult = await Auth.comparePasswords(oldPwd, passwordHash);
+
+    if (!compareResult) throw new Error('Existing passwrod is incorrect');
+   
+    let userId = req.session.user.id;
+    let updateData = {password_hash : await Auth.generatePassHash(newPwd)}
+
+    let result = await DB.updateValuesInTable(TABLE, userId, updateData);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return true;
+}
+
+module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword };

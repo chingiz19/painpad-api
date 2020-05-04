@@ -10,7 +10,7 @@ async function getUserInformation(userId) {
             'emailVerified', email_verified,
             'score', score,
             'profilePic', profile_pic,
-            'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'not selected')),
+            'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'Please select')),
             'industry', json_build_object('id', industries.id, 'value', industries.name),
             'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || countries.name),
             'since',  extract(epoch from since) * 1000
