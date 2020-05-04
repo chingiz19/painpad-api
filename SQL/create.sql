@@ -42,7 +42,7 @@ CREATE TABLE users (
  password_hash      TEXT        NOT NULL,
  score              INTEGER     NOT NULL DEFAULT 0,
  email_verified     BOOLEAN     NOT NULL DEFAULT FALSE,
- profile_pic        TEXT        NOT NULL DEFAULT 'https://www.telegraph.co.uk/content/dam/technology/2017/11/01/emoji_update_2017_1_trans_NvBQzQNjv4BqqVzuuqpFlyLIwiB6NTmJwfSVWeZ_vEN7c6bHu2jJnT8.png?imwidth=450',
+ profile_pic        TEXT        NOT NULL DEFAULT 'https://painpad-profile-pictures.s3.amazonaws.com/painpad_default',
  p_level            INTEGER     NOT NULL DEFAULT 2,     
  occupation_id      INTEGER     REFERENCES occupations(id),
  industry_id        INTEGER     REFERENCES industries(id),
