@@ -1,5 +1,7 @@
 const User = require('./user');
 
 module.exports = {
-  signup: User.signup
+  signup: User.signup,
+  changeProfile: User.changeProfile,
+  follow: User.follow
 };

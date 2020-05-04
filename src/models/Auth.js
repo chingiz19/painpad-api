@@ -11,8 +11,20 @@ async function comparePasswords(plain, hash) {
     return await bcrypt.compare(plain, hash)
 }
 
-function isUserAuthorised(req) {
-    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL ? true : false;
+function isLoggedin(req) {
+    let response;
+
+    if (req.session && req.session.user && req.session.user.p_level <= USER_LEVEL) {
+        response = { success: true, id: req.session.user.id }
+    } else {
+        response = { success: false, id: 0 }
+    }
+
+    return response;
 };
 
-module.exports = { ERROR_NOT_AUTH, generatePassHash, isUserAuthorised, comparePasswords }
+function isUserAuthorised(req) {
+    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL && true;
+};
+
+module.exports = { ERROR_NOT_AUTH, generatePassHash, isUserAuthorised, comparePasswords, isLoggedin }

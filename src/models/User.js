@@ -37,9 +37,9 @@ async function getUserPosts(userId) {
             'id', posts.id,
             'description', posts.description,
             'created', extract(epoch from posts.created) * 1000,
-            'industry', industries.name,
+            'industry', INITCAP(industries.name),
             'approved', extract(epoch from posts.approved) * 1000,
-            'subTopic', json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id),
+            'subTopic', json_build_object('id', subtopics.id, 'description', INITCAP(subtopics.name), 'topicId', topics.id),
             'location', cities.name || ', ' || countries.name
         )) AS posts
     FROM posts
@@ -58,15 +58,15 @@ async function getUserPosts(userId) {
     return result[0].posts || [];
 }
 
-async function getUserStats(userId, column) {
+async function getUserStats(userId, whereColumn, column) {
     let query = `
     SELECT 
         json_agg(json_build_object('id', users.id,
-                                'firstName', users.first_name,
-                                'lastName', users.last_name,
+                                'firstName', INITCAP(users.first_name),
+                                'lastName', INITCAP(users.last_name),
                                 'profilePic', users.profile_pic,
-                                'industry', industries.name,
-                                'occupation', occupations.name 
+                                'industry', INITCAP(industries.name),
+                                'occupation', INITCAP(occupations.name) 
                                 ))
     FROM follows
     INNER JOIN users ON users.id=follows.${column}
@@ -75,7 +75,7 @@ async function getUserStats(userId, column) {
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON state_id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
-    WHERE user_id=${userId};`;
+    WHERE ${whereColumn}=${userId};`;
 
     let result = await DB.incubate(query);
 
@@ -84,4 +84,37 @@ async function getUserStats(userId, column) {
     return result[0].json_agg || [];
 }
 
-module.exports = { getUserInformation, getUserPosts, getUserStats }
+async function changeUserProfile(userId, args) {
+    let updates = {};
+
+    for (const [field, value] of Object.entries(args)) {
+        switch (field) {
+            case 'firstName':
+                updates['first_name'] = value;
+                break;
+            case 'lastName':
+                updates['last_name'] = value;
+                break;
+            case 'locationId':
+                updates['location_id'] = value;
+                break;
+            case 'occupationId':
+                updates['occupation_id'] = value;
+                break;
+            case 'industryId':
+                updates['industry_id'] = value;
+                break;
+            case 'profilePic':
+                updates['profile_pic'] = value;
+                break;
+            default:
+                throw new Error('Unknown argument encountered');
+        }
+    }
+
+    let result = await DB.updateValuesInTable('users', userId, updates);
+
+    return result && true;
+}
+
+module.exports = { getUserInformation, getUserPosts, getUserStats, changeUserProfile }

@@ -3,7 +3,7 @@ const Asset = require('./asset');
 const Auth = require('../models/Auth');
 
 module.exports = {
-  isLogin: (parent, args, { req }) => Auth.isUserAuthorised(req),
+  isLogin: (parent, args, { req }) => Auth.isLoggedin(req),
   locations: Asset.getLocations,
   industries: Asset.getIndustries,
   occupations: Asset.getOccupations,

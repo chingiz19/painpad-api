@@ -1,5 +1,5 @@
 type Query {
-  isLogin: Boolean!
+  isLogin: AuthRes!
   locations(text: String!, limit: Int!): [Pair!]!
   industries(text: String!, limit: Int!): [Pair!]!
   occupations(text: String!, limit: Int!): [Pair!]!
@@ -11,14 +11,9 @@ type Query {
 }
 
 type Mutation {
-  signup(
-    firstName: String!
-    lastName: String!
-    email: String!
-    pwd: String!
-    cityId: ID!
-    industryId: ID!
-  ): Boolean!
+  signup(firstName: String!, lastName: String!, email: String!, pwd: String!, cityId: ID!, industryId: ID!): Boolean!
+  changeProfile(firstName: String, lastName: String, occupationId: Int, locationId: Int, industryId: Int, profilePic: String): Boolean!
+  follow(userIdToFollow: ID!): Boolean!
 }
 
 type Subscription {
@@ -92,4 +87,9 @@ type Notification {
   descrption: String!
   created: Float!
   icon: String!
+}
+
+type AuthRes {
+  success: Boolean,
+  id: ID!
 }

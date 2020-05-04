@@ -55,7 +55,7 @@ async function signup(parent, { firstName, lastName, email, pwd, cityId, industr
 async function signout(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
 
-    delete req.session.user;
+    let result = req.session.destroy();
 
     return true;
 }
@@ -74,15 +74,15 @@ async function profile(parent, { userId }, { req }) {
 }
 
 async function stats(parent, { userId }, { req }) {
-    let following = await User.getUserStats(userId, 'follows');
-    let followers = await User.getUserStats(userId, 'user_id');
+    let following = await User.getUserStats(userId, 'user_id', 'follows');
+    let followers = await User.getUserStats(userId, 'follows', 'user_id');
 
     if (!followers || !following) throw new Error(GENERIC_ERRROR);
 
     return { following, followers }
 }
 
-async function posts(parent, { userId }, { req }) {  //TODO: needs verification
+async function posts(parent, { userId }, { req }) {
     let userPosts = await User.getUserPosts(userId);
 
     if (!userPosts) throw new Error(GENERIC_ERRROR);
@@ -90,4 +90,35 @@ async function posts(parent, { userId }, { req }) {  //TODO: needs verification
     return userPosts
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats };
+async function changeProfile(parent, args, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+
+    let userId = req.session.user.id;
+
+    let result = await User.changeUserProfile(userId, args);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return true
+}
+
+async function follow(parent, { userIdToFollow }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+
+    let userId = req.session.user.id;
+
+    let insertData = {
+        user_id: userId, 
+        follows: userIdToFollow
+    }
+
+    //TODO: notify user that is being followed (label -> notification)
+
+    let result = await DB.insertValuesIntoTable('follows', insertData);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return true
+}
+
+module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow };
