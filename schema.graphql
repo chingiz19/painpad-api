@@ -16,7 +16,7 @@ type Mutation {
   changeProfile(firstName: String, lastName: String, occupationId: ID, locationId: ID, industryId: ID, profilePic: String): Boolean!
   follow(userIdToFollow: ID!): Boolean!
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
-  resetPassword(email: String!): Boolean!
+  forgotPwd(email: String!): Boolean!
 }
 
 type Subscription {

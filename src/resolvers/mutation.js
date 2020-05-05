@@ -6,5 +6,5 @@ module.exports = {
   changeProfile: User.changeProfile,
   changePwd: User.changePassword,
   follow: User.follow,
-  resetPassword: Email.resetPassword
+  forgotPwd: Email.resetPassword
 };
