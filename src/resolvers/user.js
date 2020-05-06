@@ -161,4 +161,32 @@ async function changePassword(parent, { oldPwd, newPwd }, { req }) {
     return true;
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword, unFollow };
+async function resetPwd(parent, { newPwd, token }, { req }) {
+    if (Auth.isUserAuthorised(req)) throw new Error('Already signed in');
+
+    let payload = Auth.verifyJWT(token);
+
+    if (!payload) throw new Error('Expired or invalid token');
+
+    let userId = payload.userId;
+
+    let selectResult = await DB.selectFromWhere(TABLE, ['*'], userId);
+
+    if (!selectResult) throw new Error('User is not found');
+
+    let user = selectResult[0];
+
+    let newCompareResult = await Auth.comparePasswords(newPwd, user.password_hash);
+
+    if (newCompareResult) throw new Error('New passwrod can not be same as old');
+    
+    let updateData = { password_hash: await Auth.generatePassHash(newPwd) }
+
+    let result = await DB.updateValuesInTable(TABLE, userId, updateData);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return true;
+}
+
+module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword, unFollow, resetPwd };

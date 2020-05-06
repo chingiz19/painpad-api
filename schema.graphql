@@ -17,7 +17,8 @@ type Mutation {
   follow(userIdToFollow: ID!): Boolean!
   unFollow(userIdToUnFollow: ID!): Boolean!
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
-  forgotPwd(email: String!): Boolean!
+  forgotPwd(email: String!): Boolean!,
+  resetPwd(newPwd: String!, token: String!): Boolean!
 }
 
 type Subscription {
