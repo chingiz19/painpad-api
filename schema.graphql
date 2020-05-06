@@ -15,6 +15,7 @@ type Mutation {
   signup(firstName: String!, lastName: String!, email: String!, pwd: String!, cityId: ID!, industryId: ID!): Boolean!
   changeProfile(firstName: String, lastName: String, occupationId: ID, locationId: ID, industryId: ID, profilePic: String): Boolean!
   follow(userIdToFollow: ID!): Boolean!
+  unFollow(userIdToUnFollow: ID!): Boolean!
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
   forgotPwd(email: String!): Boolean!
 }

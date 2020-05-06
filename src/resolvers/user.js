@@ -119,6 +119,23 @@ async function follow(parent, { userIdToFollow }, { req }) {
     return true
 }
 
+async function unFollow(parent, { userIdToUnFollow }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+
+    let where = [];
+    let userId = req.session.user.id;
+
+    where.push(DB.whereObj('user_id', '=', userId));
+    where.push(DB.whereObj('follows', '=', userIdToUnFollow));
+
+    let result = await DB.deleteFromWhere('follows', where);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return true
+}
+
+
 async function changePassword(parent, { oldPwd, newPwd }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
 
@@ -144,4 +161,4 @@ async function changePassword(parent, { oldPwd, newPwd }, { req }) {
     return true;
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword };
+module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword, unFollow };
