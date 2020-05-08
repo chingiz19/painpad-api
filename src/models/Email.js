@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 const Auth = require('./Auth');
 
-const RESET_PASSWORD_LINK = 'http://localhost:3000/resetPwd/';  //TODO: change this to actual production link one Elnar is done testing
+const RESET_PASSWORD_LINK = 'http://localhost:3000/resetPass/';  //TODO: change this to actual production link one Elnar is done testing
 
 const FROM_ADDRESS = 'hello@painpad.co';
 const FROM_NAME = 'PainPad Inc.';
@@ -26,9 +26,6 @@ async function resetPassword(parent, { email }, { req }) {
     let signature = Auth.signJWTToken({ userId: user.id });
 
     if (!signature) throw new Error('Error while verifying signature');
-
-    //TODO: delete after Chingiz is done with testing
-    console.log('Link for reset password', (RESET_PASSWORD_LINK + signature));
 
     let emailData = {
         link: (RESET_PASSWORD_LINK + signature),

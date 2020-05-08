@@ -63,7 +63,7 @@ CREATE TABLE subtopics (
 
 CREATE TABLE temp_posts (
  id             SERIAL      PRIMARY KEY,
- description    INTEGER     NOT NULL UNIQUE,
+ description    TEXT        NOT NULL UNIQUE,
  city_id        INTEGER     NOT NULL REFERENCES cities(id),
  industry_id    INTEGER     NOT NULL REFERENCES industries(id),
  user_id        INTEGER     REFERENCES users(id),
@@ -72,7 +72,7 @@ CREATE TABLE temp_posts (
 
 CREATE TABLE posts (
  id             SERIAL      PRIMARY KEY,
- description    INTEGER     NOT NULL UNIQUE,
+ description    TEXT        NOT NULL UNIQUE,
  city_id        INTEGER     NOT NULL REFERENCES cities(id),
  industry_id    INTEGER     NOT NULL REFERENCES industries(id),
  user_id        INTEGER     REFERENCES users(id),

@@ -1,4 +1,5 @@
 const User = require('./user');
+const Feed = require('./feed');
 const Email = require('../models/Email');
 
 module.exports = {
@@ -8,5 +9,6 @@ module.exports = {
   follow: User.follow,
   unFollow: User.unFollow,
   forgotPwd: Email.resetPassword,
-  resetPwd: User.resetPwd
+  resetPwd: User.resetPwd,
+  post: Feed.post
 };

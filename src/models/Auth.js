@@ -28,7 +28,7 @@ const verifyJWT = (token) => jwt.verify(token, JWT_KEY);
 function isLoggedin(req) {
     let response;
 
-    if (req.session && req.session.user && req.session.user.p_level <= USER_LEVEL) {
+    if (isUserAuthorised(req)) {
         response = { success: true, id: req.session.user.id }
     } else {
         response = { success: false, id: 0 }
@@ -38,7 +38,7 @@ function isLoggedin(req) {
 };
 
 function isUserAuthorised(req) {
-    return req.session && req.session.user && req.session.user.p_level <= USER_LEVEL && true;
+    return req.session && req.session.user && USER_LEVEL <= req.session.user.p_level && true;
 };
 
 module.exports = { ERROR_NOT_AUTH, generatePassHash, isUserAuthorised, comparePasswords, isLoggedin, signJWTToken, verifyJWT }

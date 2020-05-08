@@ -19,6 +19,7 @@ type Mutation {
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
   forgotPwd(email: String!): Boolean!,
   resetPwd(newPwd: String!, token: String!): Boolean!
+  post(description: String!, cityId: ID!, industryId: ID!): Boolean!
 }
 
 type Subscription {
