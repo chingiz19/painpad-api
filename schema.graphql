@@ -6,9 +6,10 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
-  userPosts(userId: ID!): [Post!]!
+  userPosts(userId: ID!): [Post]!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
+  userFeed(lastDate: Float): [Post]!
 }
 
 type Mutation {
@@ -34,9 +35,9 @@ type Topic {
 }
 
 type subTopic {
-  id: ID!
-  name: String!
-  topicId: ID!
+  id: ID
+  description: String
+  topicId: ID
 }
 
 type Profile {
@@ -74,13 +75,13 @@ type ShortUser {
 
 type Post {
   id: ID!
-  descrption: String!
-  postedBy: ShortUser
+  description: String!
+  postedBy: ShortUser!
   created: Float!
-  approved: Float!
   industry: String!
   location: String!
-  subTopic: subTopic!
+  approved: Float
+  subTopic: subTopic
 }
 
 type Pair {

@@ -30,34 +30,6 @@ async function getUserInformation(userId) {
     return result[0].info || [];
 }
 
-async function getUserPosts(userId) {
-    let query = `
-    SELECT 
-        json_agg(json_build_object(
-            'id', posts.id,
-            'description', posts.description,
-            'created', extract(epoch from posts.created) * 1000,
-            'industry', INITCAP(industries.name),
-            'approved', extract(epoch from posts.approved) * 1000,
-            'subTopic', json_build_object('id', subtopics.id, 'description', INITCAP(subtopics.name::text), 'topicId', topics.id),
-            'location', cities.name || ', ' || countries.name
-        )) AS posts
-    FROM posts
-    INNER JOIN industries ON industry_id = industries.id
-    INNER JOIN cities ON city_id = cities.id
-    INNER JOIN states ON states.id = cities.state_id
-    INNER JOIN countries ON countries.id = states.country_id
-    INNER JOIN subtopics ON subtopics.id = subtopic_id
-    INNER JOIN topics ON topics.id = subtopics.topic_id
-    WHERE user_id=${userId};`;
-
-    let result = await DB.incubate(query);
-
-    if (!result) return false;
-
-    return result[0].posts || [];
-}
-
 async function getUserStats(userId, whereColumn, column) {
     let query = `
     SELECT 
@@ -66,15 +38,11 @@ async function getUserStats(userId, whereColumn, column) {
                                 'lastName', INITCAP(users.last_name),
                                 'profilePic', users.profile_pic,
                                 'industry', INITCAP(industries.name),
-                                'occupation', INITCAP(occupations.name) 
-                                ))
+                                'occupation', INITCAP(occupations.name)))
     FROM follows
     INNER JOIN users ON users.id=follows.${column}
     LEFT JOIN occupations ON users.occupation_id = occupations.id
     INNER JOIN industries ON industry_id = industries.id
-    INNER JOIN cities ON city_id = cities.id
-    INNER JOIN states ON state_id = cities.state_id
-    INNER JOIN countries ON countries.id = states.country_id
     WHERE ${whereColumn}=${userId};`;
 
     let result = await DB.incubate(query);
@@ -115,4 +83,4 @@ async function changeUserProfile(userId, args) {
     return await DB.updateValuesInTable('users', userId, updates);
 }
 
-module.exports = { getUserInformation, getUserPosts, getUserStats, changeUserProfile }
+module.exports = { getUserInformation, getUserStats, changeUserProfile }

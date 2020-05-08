@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
-cities, temp_posts, posts, topics, subtopics, follows, same_heres, notifications CASCADE;
+cities, posts, approved_posts, topics, subtopics, follows, same_heres, notifications CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -35,56 +35,52 @@ CREATE TABLE cities (
 );
 
 CREATE TABLE users (
- id                 SERIAL      PRIMARY KEY,
- first_name         TEXT        NOT NULL,
- last_name          TEXT        NOT NULL,
- email              TEXT        NOT NULL UNIQUE,
- password_hash      TEXT        NOT NULL,
- score              INTEGER     NOT NULL DEFAULT 0,
- email_verified     BOOLEAN     NOT NULL DEFAULT FALSE,
- profile_pic        TEXT        NOT NULL DEFAULT 'https://painpad-profile-pictures.s3.amazonaws.com/painpad_default',
- p_level            INTEGER     NOT NULL DEFAULT 2,     
- occupation_id      INTEGER     REFERENCES occupations(id),
- industry_id        INTEGER     REFERENCES industries(id),
- since              DATE        NOT NULL DEFAULT current_timestamp,
- city_id            INTEGER     REFERENCES cities(id)
+ id                 SERIAL                              PRIMARY KEY,
+ first_name         TEXT                                NOT NULL,
+ last_name          TEXT                                NOT NULL,
+ email              TEXT                                NOT NULL    UNIQUE,
+ password_hash      TEXT                                NOT NULL,
+ score              INTEGER                             NOT NULL    DEFAULT 0,
+ email_verified     BOOLEAN                             NOT NULL    DEFAULT FALSE,
+ profile_pic        TEXT                                NOT NULL    DEFAULT 'https://painpad-profile-pictures.s3.amazonaws.com/painpad_default',
+ p_level            INTEGER                             NOT NULL    DEFAULT 2,     
+ occupation_id      INTEGER                             REFERENCES occupations(id),
+ industry_id        INTEGER                             REFERENCES industries(id),
+ since              TIMESTAMP WITHOUT TIME ZONE         NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+ city_id            INTEGER                             REFERENCES cities(id)
 );
 
 CREATE TABLE topics (
  id         SERIAL      PRIMARY KEY,
- name       INTEGER     NOT NULL UNIQUE
+ name       TEXT        NOT NULL    UNIQUE
 );
 
 CREATE TABLE subtopics (
  id         SERIAL      PRIMARY KEY,
- name       INTEGER     NOT NULL UNIQUE,
+ name       TEXT        NOT NULL    UNIQUE,
  topic_id   INTEGER     REFERENCES topics(id)
 );
 
-CREATE TABLE temp_posts (
- id             SERIAL      PRIMARY KEY,
- description    TEXT        NOT NULL UNIQUE,
- city_id        INTEGER     NOT NULL REFERENCES cities(id),
- industry_id    INTEGER     NOT NULL REFERENCES industries(id),
- user_id        INTEGER     REFERENCES users(id),
- created        DATE        NOT NULL DEFAULT current_timestamp
+CREATE TABLE posts (
+ id             SERIAL                          PRIMARY KEY,
+ description    TEXT                            NOT NULL    UNIQUE,
+ city_id        INTEGER                         NOT NULL REFERENCES cities(id),
+ industry_id    INTEGER                         NOT NULL REFERENCES industries(id),
+ user_id        INTEGER                         REFERENCES users(id),
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE posts (
- id             SERIAL      PRIMARY KEY,
- description    TEXT        NOT NULL UNIQUE,
- city_id        INTEGER     NOT NULL REFERENCES cities(id),
- industry_id    INTEGER     NOT NULL REFERENCES industries(id),
- user_id        INTEGER     REFERENCES users(id),
- created        DATE        NOT NULL,
- approved       DATE        NOT NULL DEFAULT current_timestamp,
- subtopic_id    INTEGER     REFERENCES subtopics(id)
+CREATE TABLE approved_posts (
+ id             SERIAL                          PRIMARY KEY,
+ post_id        INTEGER                         NOT NULL    REFERENCES posts(id),
+ approved       TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+ subtopic_id    INTEGER                         REFERENCES subtopics(id)
 );
 
 CREATE TABLE same_heres (
  id             SERIAL      PRIMARY KEY,
  user_id        INTEGER     REFERENCES users(id),
- post_id        INTEGER     REFERENCES posts(id)
+ post_id        INTEGER     REFERENCES approved_posts(id)
 );
 
 CREATE TABLE follows (
@@ -94,17 +90,17 @@ CREATE TABLE follows (
 );
 
 CREATE TABLE notifications (
- id             SERIAL      PRIMARY KEY,
- description    INTEGER     NOT NULL UNIQUE,
- user_id        INTEGER     REFERENCES users(id),
- created        DATE        NOT NULL,
- icon           TEXT        NOT NULL DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
+ id             SERIAL                          PRIMARY KEY,
+ description    TEXT                            NOT NULL    UNIQUE,
+ user_id        INTEGER                         REFERENCES users(id),
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
+ icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
 
-INSERT INTO public.regions(name) VALUES ('North America');
-INSERT INTO public.countries(name, region_id) VALUES ('Canada', 1);
-INSERT INTO public.states(name, country_id) VALUES ('Alberta', 1);
-INSERT INTO public.cities(name, state_id) VALUES ('Calgary', 1);
+INSERT INTO public.regions(name)                VALUES ('North America');
+INSERT INTO public.countries(name, region_id)   VALUES ('Canada', 1);
+INSERT INTO public.states(name, country_id)     VALUES ('Alberta', 1);
+INSERT INTO public.cities(name, state_id)       VALUES ('Calgary', 1);
 
 INSERT INTO public.occupations(name) VALUES ('Software Developer');
 INSERT INTO public.occupations(name) VALUES ('Financial Analyst');
@@ -117,3 +113,6 @@ INSERT INTO public.industries(name) VALUES ('Investment Management');
 INSERT INTO public.industries(name) VALUES ('Oil and Gas');
 INSERT INTO public.industries(name) VALUES ('Consulting');
 INSERT INTO public.industries(name) VALUES ('Dentistry');
+
+INSERT INTO public.topics(name) VALUES ('Parking');
+INSERT INTO public.subtopics(name, topic_id) VALUES ('Expensive', 1);

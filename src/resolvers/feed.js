@@ -13,11 +13,21 @@ async function post(parent, { description, cityId, industryId }, { req }) {
         description
     }
 
-    let result = await DB.insertValuesIntoTable('temp_posts', data)
+    let result = await DB.insertValuesIntoTable('posts', data)
 
     if (!result) throw new Error('Error while uploading post');
 
     return true;
 }
 
-module.exports = { post }
+async function userFeed(parent, { lastDate }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+
+    let result = await Feed.getUserFeed(null, lastDate)
+
+    if (!result) throw new Error('Error while getting news feed');
+
+    return result;
+}
+
+module.exports = { post, userFeed }

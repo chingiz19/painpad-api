@@ -1,5 +1,7 @@
 const Auth = require('../models/Auth');
 const User = require('../models/User');
+const Feed = require('../models/Feed');
+
 const TABLE = 'users';
 const GENERIC_ERRROR = 'Unexpexted error occured while request';
 
@@ -79,11 +81,11 @@ async function stats(parent, { userId }, { req }) {
 }
 
 async function posts(parent, { userId }, { req }) {
-    let userPosts = await User.getUserPosts(userId);
+    let result = await Feed.getUserFeed(userId)
 
-    if (!userPosts) throw new Error(GENERIC_ERRROR);
+    if (!result) throw new Error(GENERIC_ERRROR);
 
-    return userPosts
+    return result;
 }
 
 async function changeProfile(parent, args, { req }) {

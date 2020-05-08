@@ -1,5 +1,6 @@
 const User = require('./user');
 const AWS = require('./aws');
+const Feed = require('./feed');
 const Asset = require('./asset');
 const Auth = require('../models/Auth');
 
@@ -13,5 +14,6 @@ module.exports = {
   userStats: User.stats,
   userPosts: User.posts,
   signout: User.signout,
-  signS3: AWS.signS3
+  signS3: AWS.signS3,
+  userFeed: Feed.userFeed
 };
