@@ -8,7 +8,7 @@ aws.config.update({
 });
 
 async function signS3(parent, { fileName, fileType }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const s3 = new aws.S3();
 

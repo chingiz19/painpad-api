@@ -89,7 +89,7 @@ async function posts(parent, { userId }, { req }) {
 }
 
 async function changeProfile(parent, args, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let userId = req.session.user.id;
 
@@ -103,7 +103,7 @@ async function changeProfile(parent, args, { req }) {
 }
 
 async function follow(parent, { userIdToFollow }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let userId = req.session.user.id;
 
@@ -122,7 +122,7 @@ async function follow(parent, { userIdToFollow }, { req }) {
 }
 
 async function unFollow(parent, { userIdToUnFollow }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let where = [];
     let userId = req.session.user.id;
@@ -137,9 +137,8 @@ async function unFollow(parent, { userIdToUnFollow }, { req }) {
     return true
 }
 
-
 async function changePassword(parent, { oldPwd, newPwd }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let passwordHash = req.session.user.password_hash;
 

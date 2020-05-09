@@ -2,7 +2,7 @@ const Feed = require('../models/Feed');
 const Auth = require('../models/Auth');
 
 async function post(parent, { description, cityId, industryId }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let userId = req.session.user.id;
 
@@ -20,14 +20,24 @@ async function post(parent, { description, cityId, industryId }, { req }) {
     return true;
 }
 
-async function userFeed(parent, { lastDate }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error('Not signed in');
-
-    let result = await Feed.getUserFeed(null, lastDate)
+async function userFeed(parent, { lastDate, count }, { req }) {
+    let result = await Feed.getUserFeed(null, count, lastDate)
 
     if (!result) throw new Error('Error while getting news feed');
 
     return result;
 }
 
-module.exports = { post, userFeed }
+async function pendingPosts(parent, args, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    let userId = req.session.user.id;
+
+    let result = await Feed.getUserPendingPosts(userId);
+
+    if (!result) throw new Error(GENERIC_ERRROR);
+
+    return result;
+}
+
+module.exports = { post, userFeed, pendingPosts }

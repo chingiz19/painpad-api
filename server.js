@@ -1,6 +1,7 @@
 require("dotenv").config({ path: ".env" });
 
 const { GraphQLServer } = require("graphql-yoga");
+const { formatError } = require("apollo-errors");
 const session = require("express-session");
 const redis = require("redis");
 const ms = require("ms");
@@ -60,6 +61,7 @@ server.express.use(sessionMiddleWare);
 //Apollo Server options
 let options = {
   port,
+  formatError,
   endpoint: "/graphql",
   playground: "/playground",
   subscriptions: {

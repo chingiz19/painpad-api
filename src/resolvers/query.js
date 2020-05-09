@@ -12,8 +12,9 @@ module.exports = {
   signin: User.signin,
   userProfile: User.profile,
   userStats: User.stats,
-  userPosts: User.posts,
   signout: User.signout,
   signS3: AWS.signS3,
-  userFeed: Feed.userFeed
+  userFeed: Feed.userFeed,
+  userPosts: User.posts,
+  userPendingPosts: Feed.pendingPosts
 };

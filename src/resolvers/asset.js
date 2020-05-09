@@ -22,7 +22,7 @@ async function getLocations(parent, args, { req }) {
 }
 
 async function getOccupations(parent, args, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Error(Auth.ERROR_NOT_AUTH);
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let params = [args.text.toLowerCase(), args.limit];
 

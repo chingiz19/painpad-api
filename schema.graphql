@@ -9,7 +9,8 @@ type Query {
   userPosts(userId: ID!): [Post]!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
-  userFeed(lastDate: Float): [Post]!
+  userFeed(lastDate: Float, count: Int): [Post]!
+  userPendingPosts: [Post]!
 }
 
 type Mutation {
@@ -26,7 +27,6 @@ type Mutation {
 type Subscription {
   newPost: Post
   notification: Notification
-  sameHere(postId: ID!): ID!
 }
 
 type Topic {
