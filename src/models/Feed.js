@@ -15,7 +15,7 @@ async function getUserFeed(userId, count = 20, lastDate) {
             'location', cities.name || ', ' || countries.name,
             'sameHere', COALESCE(sh.count, 0),
             'postedBy', users.obj
-        ) ORDER BY ap.approved ASC) AS posts
+        ) ORDER BY posts.created DESC) AS posts
     FROM posts
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = subtopic_id
