@@ -51,7 +51,7 @@ type Subscription {
 type Topic {
   id: ID!
   name: String!
-  subs: [subTopic!]!
+  subs: [subTopic!]
 }
 
 type subTopic {
