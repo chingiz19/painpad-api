@@ -80,7 +80,7 @@ CREATE TABLE approved_posts (
 CREATE TABLE same_heres (
  id             SERIAL      PRIMARY KEY,
  user_id        INTEGER     REFERENCES users(id),
- post_id        INTEGER     REFERENCES approved_posts(id)
+ post_id        INTEGER     REFERENCES approved_posts(post_id)
 );
 
 CREATE TABLE follows (

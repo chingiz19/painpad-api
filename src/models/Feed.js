@@ -1,4 +1,4 @@
-async function getUserFeed(userId, count = 20, lastDate) {
+async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
     let whereStr = '';
 
     if (lastDate) whereStr = `WHERE (extract(epoch from COALESCE(ap.approved, posts.created)) * 1000)  > ${lastDate}`;
@@ -14,6 +14,7 @@ async function getUserFeed(userId, count = 20, lastDate) {
             'topic', json_build_object('id', topics.id, 'name', INITCAP(topics.name)),
             'location', cities.name || ', ' || countries.name,
             'sameHere', COALESCE(sh.count, 0),
+            'sameHered', sh.same_hered,
             'postedBy', users.obj
         ) ORDER BY posts.created DESC) AS posts
     FROM posts
@@ -24,7 +25,7 @@ async function getUserFeed(userId, count = 20, lastDate) {
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
-    LEFT JOIN (SELECT post_id, count(user_id) FROM same_heres GROUP BY post_id) AS sh ON sh.post_id = ap.id
+    LEFT JOIN (SELECT post_id, count(user_id), ${firstPersonId}=ANY(array_agg(user_id)) AS same_hered FROM same_heres GROUP BY post_id) AS sh ON sh.post_id = ap.id
     INNER JOIN 
     (SELECT
         users.id,

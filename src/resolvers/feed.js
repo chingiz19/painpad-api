@@ -21,7 +21,9 @@ async function post(parent, { description, cityId, industryId }, { req }) {
 }
 
 async function userFeed(parent, { lastDate, count }, { req }) {
-    let result = await Feed.getUserFeed(null, count, lastDate)
+    let firstPersonId = (req.session.user &&  req.session.user.id) || 0;
+
+    let result = await Feed.getUserFeed(firstPersonId, null, count, lastDate);
 
     if (!result) throw new Error('Error while getting news feed');
 

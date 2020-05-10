@@ -103,6 +103,7 @@ type Post {
   approved: Float!
   topic: Topic!
   sameHere: Int!
+  sameHered: Boolean!
 }
 
 type PendingPost {

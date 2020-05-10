@@ -81,7 +81,9 @@ async function stats(parent, { userId }, { req }) {
 }
 
 async function posts(parent, { userId }, { req }) {
-    let result = await Feed.getUserFeed(userId)
+    let firstPersonId = (req.session.user &&  req.session.user.id) || 0;
+
+    let result = await Feed.getUserFeed(firstPersonId, userId);
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
