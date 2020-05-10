@@ -10,5 +10,6 @@ module.exports = {
   unFollow: User.unFollow,
   forgotPwd: Email.resetPassword,
   resetPwd: User.resetPwd,
-  post: Feed.post
+  post: Feed.post,
+  sameHere: Feed.sameHere
 };

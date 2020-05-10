@@ -16,5 +16,6 @@ module.exports = {
   signS3: AWS.signS3,
   userFeed: Feed.userFeed,
   userPosts: User.posts,
-  userPendingPosts: Feed.pendingPosts
+  userPendingPosts: Feed.pendingPosts,
+  sameHereUsers: Feed.sameHereUsers
 };
