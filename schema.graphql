@@ -51,7 +51,7 @@ type Subscription {
 type Topic {
   id: ID!
   name: String!
-  subTopics: [subTopic!]!
+  subs: [subTopic!]!
 }
 
 type subTopic {
@@ -101,7 +101,7 @@ type Post {
   industry: String!
   location: String!
   approved: Float!
-  subTopic: subTopic!
+  topic: Topic!
   sameHere: Int!
 }
 
