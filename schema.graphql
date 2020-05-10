@@ -1,5 +1,6 @@
 type Query {
   isLogin: AuthRes!
+  isAdmin: Boolean!
   locations(text: String!, limit: Int!): [Pair!]!
   industries(text: String!, limit: Int!): [Pair!]!
   occupations(text: String!, limit: Int!): [Pair!]!
@@ -12,15 +13,31 @@ type Query {
   userFeed(lastDate: Float, count: Int): [Post]!
   userPendingPosts: [PendingPost]!
   sameHereUsers(postId: ID!): [ShortUser]!
+  adminPendingPosts: [PendingPost]!
+  adminAllTopics: [Topic]!
 }
 
 type Mutation {
-  signup(firstName: String!, lastName: String!, email: String!, pwd: String!, cityId: ID!, industryId: ID!): Boolean!
-  changeProfile(firstName: String, lastName: String, occupationId: ID, locationId: ID, industryId: ID, profilePic: String): Boolean!
+  signup(
+    firstName: String!
+    lastName: String!
+    email: String!
+    pwd: String!
+    cityId: ID!
+    industryId: ID!
+  ): Boolean!
+  changeProfile(
+    firstName: String
+    lastName: String
+    occupationId: ID
+    locationId: ID
+    industryId: ID
+    profilePic: String
+  ): Boolean!
   follow(userIdToFollow: ID!): Boolean!
   unFollow(userIdToUnFollow: ID!): Boolean!
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
-  forgotPwd(email: String!): Boolean!,
+  forgotPwd(email: String!): Boolean!
   resetPwd(newPwd: String!, token: String!): Boolean!
   post(description: String!, cityId: ID!, industryId: ID!): Boolean!
   sameHere(postId: ID!, add: Boolean!): Boolean!
@@ -34,6 +51,7 @@ type Subscription {
 type Topic {
   id: ID!
   name: String!
+  subTopics: [subTopic!]!
 }
 
 type subTopic {

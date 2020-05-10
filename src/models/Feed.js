@@ -47,7 +47,7 @@ async function getUserFeed(userId, count = 20, lastDate) {
     return result[0].posts || [];
 }
 
-async function getUserPendingPosts(userId) {
+async function getPendingPosts(userId) {
     let query = `
     SELECT 
         json_agg(json_build_object(
@@ -75,8 +75,8 @@ async function getUserPendingPosts(userId) {
                         'occupation', INITCAP(occupations.name)) AS obj
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
-    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = ${userId}
-    WHERE approved IS NULL ;`;
+    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = ${userId || 'posts.user_id'} 
+    WHERE approved IS NULL;`;
 
     let result = await DB.incubate(query);
 
@@ -85,7 +85,7 @@ async function getUserPendingPosts(userId) {
     return result[0].posts || [];
 }
 
-async function getUserFeed(postId) {
+async function sameHereUsers(postId) {
     let query = `
     SELECT json_agg(users.obj) AS users
     FROM same_heres AS sh
@@ -110,4 +110,4 @@ async function getUserFeed(postId) {
     return result[0].users || [];
 }
 
-module.exports = { getUserFeed, getUserPendingPosts, getUserFeed }
+module.exports = { getUserFeed, sameHereUsers, getPendingPosts }

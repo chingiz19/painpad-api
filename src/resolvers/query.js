@@ -1,11 +1,13 @@
 const User = require('./user');
 const AWS = require('./aws');
 const Feed = require('./feed');
+const Admin = require('./admin');
 const Asset = require('./asset');
 const Auth = require('../models/Auth');
 
 module.exports = {
   isLogin: (parent, args, { req }) => Auth.isLoggedin(req),
+  isAdmin: (parent, args, { req }) => Auth.isAdminAuthorised(req),
   locations: Asset.getLocations,
   industries: Asset.getIndustries,
   occupations: Asset.getOccupations,
@@ -17,5 +19,7 @@ module.exports = {
   userFeed: Feed.userFeed,
   userPosts: User.posts,
   userPendingPosts: Feed.pendingPosts,
-  sameHereUsers: Feed.sameHereUsers
+  sameHereUsers: Feed.sameHereUsers,
+  adminPendingPosts: Admin.pedningPosts,
+  adminAllTopics: Admin.allTopics
 };

@@ -53,7 +53,7 @@ async function sameHere(parent, { postId, add }, { req }) {
 }
 
 async function sameHereUsers(parent, { postId }, { req }) {
-    let result = await Feed.getUserFeed(postId);
+    let result = await Feed.sameHereUsers(postId);
 
     if (!result) throw new Error('Error while getting same here users');
 
@@ -65,7 +65,7 @@ async function pendingPosts(parent, args, { req }) {
 
     let userId = req.session.user.id;
 
-    let result = await Feed.getUserPendingPosts(userId);
+    let result = await Feed.getPendingPosts(userId);
 
     if (!result) throw new Error(GENERIC_ERRROR);
 

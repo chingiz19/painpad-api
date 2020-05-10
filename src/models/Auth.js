@@ -5,6 +5,7 @@ const { createError } = require("apollo-errors");
 const JWT_KEY = process.env.JWT_KEY;
 const JWT_EXPIRATION = 24 * 60 * 60; //24 hours
 const USER_LEVEL = 2;
+const ADMIN_LEVEL = 3;
 const ERROR_MESSAGE = 'Not authorized';
 
 async function generatePassHash(plain) {
@@ -48,9 +49,22 @@ function isUserAuthorised(req) {
     return req.session && req.session.user && USER_LEVEL <= req.session.user.p_level && true;
 };
 
+function isAdminAuthorised(req) {
+    return req.session && req.session.user && ADMIN_LEVEL <= req.session.user.p_level && true;
+};
+
 const AuthenticationError = createError("AuthError", {
-    data: {code: 1},
+    data: { code: 1 },
     message: ERROR_MESSAGE
 });
 
-module.exports = { generatePassHash, isUserAuthorised, comparePasswords, isLoggedin, signJWTToken, verifyJWT, AuthenticationError }
+const AdminAuthenticationError = createError("AuthError", {
+    data: { code: 2 },
+    message: ERROR_MESSAGE + ' - Admin'
+});
+
+module.exports = {
+    generatePassHash, isUserAuthorised, comparePasswords,
+    isLoggedin, signJWTToken, verifyJWT, isAdminAuthorised,
+    AuthenticationError, AdminAuthenticationError
+}
