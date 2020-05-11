@@ -41,6 +41,10 @@ type Mutation {
   resetPwd(newPwd: String!, token: String!): Boolean!
   post(description: String!, cityId: ID!, industryId: ID!): Boolean!
   sameHere(postId: ID!, add: Boolean!): Boolean!
+  removePost(postId: ID!): Boolean!
+  adminAddTopic(name: String!): Boolean!
+  adminAddSubTopic(name: String!, topicId: ID!): Boolean!
+  adminApprovePost(postId: ID!, subTopicId: ID!): Boolean!
 }
 
 type Subscription {
@@ -51,7 +55,7 @@ type Subscription {
 type Topic {
   id: ID!
   name: String!
-  subs: [subTopic!]
+  subs: [subTopic!]!
 }
 
 type subTopic {

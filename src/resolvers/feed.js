@@ -21,7 +21,7 @@ async function post(parent, { description, cityId, industryId }, { req }) {
 }
 
 async function userFeed(parent, { lastDate, count }, { req }) {
-    let firstPersonId = (req.session.user &&  req.session.user.id) || 0;
+    let firstPersonId = (req.session.user && req.session.user.id) || 0;
 
     let result = await Feed.getUserFeed(firstPersonId, null, count, lastDate);
 
@@ -74,4 +74,27 @@ async function pendingPosts(parent, args, { req }) {
     return result;
 }
 
-module.exports = { post, userFeed, pendingPosts, sameHereUsers, sameHere }
+async function removePost(parent, { postId }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    const table = 'posts';
+    let userId = req.session.user.id;
+
+    let select = await DB.selectFromWhere(table, ['user_id'], postId);
+
+    if (!select) throw new Error('Post does not exist');
+
+    if (select[0].user_id !== userId) throw new Error(`User can not delete other people's posts`);
+
+    let deleteApproved = await DB.deleteFromWhere('approved_posts', [DB.whereObj('post_id', '=', postId)]);
+
+    if (!deleteApproved) console.log('Deleting pending post', postId, 'for user', userId)
+
+    let result = await DB.deleteFromWhere(table, postId);
+
+    if (!result) throw new Error('Error while removing post');
+
+    return true;
+}
+
+module.exports = { post, userFeed, pendingPosts, sameHereUsers, sameHere, removePost }

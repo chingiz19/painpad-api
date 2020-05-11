@@ -1,5 +1,6 @@
 const User = require('./user');
 const Feed = require('./feed');
+const Admin = require('./admin');
 const Email = require('../models/Email');
 
 module.exports = {
@@ -11,5 +12,9 @@ module.exports = {
   forgotPwd: Email.resetPassword,
   resetPwd: User.resetPwd,
   post: Feed.post,
-  sameHere: Feed.sameHere
+  sameHere: Feed.sameHere,
+  adminAddTopic: Admin.addTopic,
+  adminAddSubTopic: Admin.addSubTopic,
+  adminApprovePost: Admin.approvePost,
+  removePost: Feed.removePost
 };
