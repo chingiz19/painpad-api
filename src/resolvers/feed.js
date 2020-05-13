@@ -36,10 +36,12 @@ async function sameHere(parent, { postId, add }, { req }) {
     const tableName = 'same_heres';
 
     let result;
+    let sendNotification = false;
     let userId = req.session.user.id;
 
     if (add) {
         result = await DB.insertValuesIntoTable(tableName, { user_id: userId, post_id: postId });
+        sendNotification = true;
     } else {
         let where = [];
 
@@ -50,6 +52,8 @@ async function sameHere(parent, { postId, add }, { req }) {
     }
 
     if (!result) throw new Error('Error while getting news feed');
+
+    //TODO: send notification to user about same here
 
     return true;
 }

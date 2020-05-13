@@ -1,7 +1,22 @@
 async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
     let whereStr = '';
+    let whereArr = [];
+    let counter = 1;
+    let params = [];
 
-    if (lastDate) whereStr = `WHERE (extract(epoch from COALESCE(ap.approved, posts.created)) * 1000)  > ${lastDate}`;
+    if (lastDate) {
+        whereArr.push(`WHERE (extract(epoch from COALESCE(ap.approved, posts.created)) * 1000)  > $${counter}`);
+        params.push(lastDate);
+        counter++;
+    }
+
+    if (userId) {
+        whereArr.push(`posts.user_id=$${counter}`);
+        params.push(userId);
+        counter++;
+    }
+
+    if (whereArr.length > 0) whereStr = `WHERE ${whereArr.join(' AND ')}`;
 
     let query = `
     SELECT 
@@ -37,11 +52,11 @@ async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
                         'occupation', INITCAP(occupations.name)) AS obj
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
-    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = ${userId || 'posts.user_id'} 
+    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
     ${whereStr}
     LIMIT ${count};`;
 
-    let result = await DB.incubate(query);
+    let result = await DB.incubate(query, params);
 
     if (!result) return false;
 

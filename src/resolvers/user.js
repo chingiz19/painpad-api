@@ -189,6 +189,8 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
+    //TODO: notify via email that user's password has been changed
+
     return true;
 }
 

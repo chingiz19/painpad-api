@@ -83,4 +83,12 @@ async function changeUserProfile(userId, args) {
     return await DB.updateValuesInTable('users', userId, updates);
 }
 
-module.exports = { getUserInformation, getUserStats, changeUserProfile }
+async function incrementScore(userId, score = 1) {
+    let result = await DB.updateValuesInTable('users', userId, { score });
+
+    //TODO: notify user
+
+    return result;
+}
+
+module.exports = { getUserInformation, getUserStats, changeUserProfile, incrementScore }
