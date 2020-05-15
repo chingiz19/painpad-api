@@ -64,6 +64,16 @@ async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
 }
 
 async function getPendingPosts(userId) {
+    let whereStr = '';
+    let counter = 1;
+    let params = [];
+
+    if (userId) {
+        whereStr = `AND posts.user_id=$${counter}`;
+        params.push(userId);
+        counter++;
+    }
+
     let query = `
     SELECT 
         json_agg(json_build_object(
@@ -91,10 +101,10 @@ async function getPendingPosts(userId) {
                         'occupation', INITCAP(occupations.name)) AS obj
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
-    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = ${userId || 'posts.user_id'} 
-    WHERE approved IS NULL;`;
+    INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
+    WHERE approved IS NULL ${whereStr};`;
 
-    let result = await DB.incubate(query);
+    let result = await DB.incubate(query, params);
 
     if (!result) return false;
 
