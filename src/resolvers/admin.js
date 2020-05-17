@@ -39,7 +39,7 @@ async function addTopic(parent, { name }, { req }) {
 
     if (!result) throw new Error('Error while adding topic');
 
-    return true;
+    return result[0].id;
 }
 
 async function addSubTopic(parent, { name, topicId }, { req }) {
@@ -49,7 +49,7 @@ async function addSubTopic(parent, { name, topicId }, { req }) {
 
     if (!result) throw new Error('Error while adding a subtopic');
 
-    return true;
+    return result[0].id;
 }
 
 async function approvePost(parent, { postId, subTopicId }, { req }) {
