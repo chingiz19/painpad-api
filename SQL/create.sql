@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
-cities, posts, approved_posts, topics, subtopics, follows, same_heres, notifications CASCADE;
+cities, posts, approved_posts, topics, subtopics, follows, same_heres, reject_reasons,
+rejected_posts, notifications CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -77,6 +78,24 @@ CREATE TABLE approved_posts (
  subtopic_id    INTEGER                         REFERENCES subtopics(id)
 );
 
+CREATE TABLE reject_reasons (
+ id             SERIAL  PRIMARY KEY,
+ description    TEXT	NOT NULL    UNIQUE
+);
+
+CREATE TABLE rejected_posts (
+ id             SERIAL                          PRIMARY KEY,
+ description    TEXT                            NOT NULL    UNIQUE,
+ city_id        INTEGER                         NOT NULL    REFERENCES cities(id),
+ industry_id    INTEGER                         NOT NULL    REFERENCES industries(id),
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
+ rejected       TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+ rejected_by    INTEGER                         NOT NULL    REFERENCES users(id),
+ reson_id       INTEGER                         NOT NULL    REFERENCES reject_reasons(id),
+ explanation    TEXT,
+ suggestion     TEXT
+);
+
 CREATE TABLE same_heres (
  id             SERIAL      PRIMARY KEY,
  user_id        INTEGER     REFERENCES users(id),
@@ -114,5 +133,5 @@ INSERT INTO public.industries(name) VALUES ('Oil and Gas');
 INSERT INTO public.industries(name) VALUES ('Consulting');
 INSERT INTO public.industries(name) VALUES ('Dentistry');
 
-INSERT INTO public.topics(name) VALUES ('Parking');
-INSERT INTO public.subtopics(name, topic_id) VALUES ('Expensive', 1);
+INSERT INTO public.topics(name)                 VALUES ('Parking');
+INSERT INTO public.subtopics(name, topic_id)    VALUES ('Expensive', 1);
