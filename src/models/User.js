@@ -86,6 +86,7 @@ async function changeUserProfile(userId, args) {
 async function incrementScore(userId, score = 1) {
     let result = await DB.updateValuesInTable('users', userId, { score });
 
+    if (result) console.log('Pushing', score, 'points to user', userId);
     //TODO: notify user
 
     return result;

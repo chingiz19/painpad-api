@@ -57,17 +57,17 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     const APPROVE_ERROR_MESSAGE = 'Error while approving post';
 
-    let currentUser = await Admin.getPostUser(subTopicId);
+    let currentUser = await Admin.getPostUser(postId);
 
     if (!currentUser) throw new Error(APPROVE_ERROR_MESSAGE);
 
     let postUserTotalScore = 1;
     const currentUserId = currentUser.id;
-    const currentOccupationId = currentUser.occupationId;
-    const currentIndustryId = currentUser.industryId;
-    const currentCityId = currentUser.cityId;
-    const currentStateId = currentUser.stateId;
-    const currentCountryId = currentUser.countryId;
+    const currentOccupationId = currentUser.occupation;
+    const currentIndustryId = currentUser.industry;
+    const currentCityId = currentUser.city;
+    const currentStateId = currentUser.state;
+    const currentCountryId = currentUser.country;
 
     let subTopicPosts = await Admin.getSubTopicPosts(subTopicId);
 
@@ -83,7 +83,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
         const postStateId = post.stateId;
         const postCountryId = post.countryId;
 
-        if (currentOccupationId === postUserOccupationId) {
+        if (currentOccupationId && postUserOccupationId && currentOccupationId === postUserOccupationId) {
             postUserTotalScore += MATCH_SCORES.OCCUPATION;
             User.incrementScore(postUserId, MATCH_SCORES.OCCUPATION);
         }
@@ -126,7 +126,8 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     User.incrementScore(currentUserId, postUserTotalScore);
 
-    //TODO: send email notification about being approved
+    //TODO: send push notification about being approved and total score
+    //TODO: send email notification about being approved and total score
 
     return true;
 }

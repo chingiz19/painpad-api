@@ -38,7 +38,7 @@ async function getSubTopicPosts(subTopicId) {
     INNER JOIN countries ON countries.id = states.country_id
     INNER JOIN 
     (SELECT
-        users.id, json_build_object('id', users.id, 'industry', industries.id, 'occupationId', occupations.id) AS obj
+        users.id, json_build_object('id', users.id, 'industryId', industries.id, 'occupationId', occupations.id) AS obj
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
     INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
@@ -48,33 +48,31 @@ async function getSubTopicPosts(subTopicId) {
 
     if (!result) return false;
 
-    return result.posts || [];
+    return result[0].posts || [];
 }
 
 async function getPostUser(postId) {
     let query = `
-    SELECT json_build_object('id', users.id, 'industry', industries.id
-                    'cityId', cities.id, 'stateId', states.id,
-                    'countryId', countries.id) AS user
+    SELECT users.id, users.industry_id AS industry,
+    cities.id AS city, users.occupation_id AS occupation,
+    states.id AS state, countries.id AS country
     FROM users
-    INNER JOIN industries ON industry_id = industries.id
     INNER JOIN posts ON users.id = posts.user_id
-    INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN cities ON users.city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
-    WHERE ap.post_id = $1;`;
+    WHERE posts.id = $1;`;
 
     let result = await DB.incubate(query, [postId]);
 
     if (!result) return false;
 
-    return result[0].user || {};
+    return result[0] || {};
 }
 
 async function getTopicUsers(topicId) {
     let query = `
-    SELECT json_agg(json_build_object('id', users.id, 'industry', industries.id)) AS users
+    SELECT json_agg(json_build_object('id', users.id)) AS users
     FROM users
     INNER JOIN industries ON industry_id = industries.id
     INNER JOIN posts ON users.id = posts.user_id
@@ -87,7 +85,7 @@ async function getTopicUsers(topicId) {
 
     if (!result) return false;
 
-    return result.users || [];
+    return result[0].users || [];
 }
 
 module.exports = { getAllTopics, getSubTopicPosts, getPostUser, getTopicUsers }
