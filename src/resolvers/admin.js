@@ -4,12 +4,12 @@ const User = require('../models/User');
 const Feed = require('../models/Feed');
 
 const MATCH_SCORES = {
-    OCCUPATION : 10,
-    USER_INDUSTRY : 4,
-    POST_INDUSTRY : 3,
-    CITY : 3,
-    STATE : 2,
-    COUNTRY : 1
+    OCCUPATION: 10,
+    USER_INDUSTRY: 4,
+    POST_INDUSTRY: 3,
+    CITY: 3,
+    STATE: 2,
+    COUNTRY: 1
 }
 
 async function pedningPosts(parent, args, { req }) {
@@ -35,21 +35,31 @@ async function allTopics(parent, args, { req }) {
 async function addTopic(parent, { name }, { req }) {
     if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
 
+    let select = await DB.selectFromWhere('topics', ['id'], [DB.whereObj('name', '=', name)]);
+
+    if (select) throw new Error('Given topic already exists');
+
     let result = await DB.insertValuesIntoTable('topics', { name });
 
     if (!result) throw new Error('Error while adding topic');
 
-    return result[0].id;
+    return result.id;
 }
 
 async function addSubTopic(parent, { name, topicId }, { req }) {
     if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
 
+    let whereObj = [DB.whereObj('name', '=', name), DB.whereObj('topic_id', '=', topicId)];
+
+    let select = await DB.selectFromWhere('subtopics', ['id'], whereObj);
+
+    if (select) throw new Error('Given subtopic for a given topic id already exists');
+
     let result = await DB.insertValuesIntoTable('subtopics', { name, topic_id: topicId });
 
     if (!result) throw new Error('Error while adding a subtopic');
 
-    return result[0].id;
+    return result.id;
 }
 
 async function approvePost(parent, { postId, subTopicId }, { req }) {
@@ -107,7 +117,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
             postUserTotalScore += MATCH_SCORES.STATE;
             User.incrementScore(postUserId, MATCH_SCORES.STATE);
         }
-        
+
         if (currentCountryId === postCountryId) {
             postUserTotalScore += MATCH_SCORES.COUNTRY;
             User.incrementScore(postUserId, MATCH_SCORES.COUNTRY);

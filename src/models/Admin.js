@@ -4,9 +4,9 @@ async function getAllTopics() {
     SELECT topics.id, topics.name, json_agg(json_build_object(
         'id', sub.id,
         'description', sub.name,
-        'topicId', topics.id)) AS subs
+        'topicId', topics.id )) AS subs
     FROM topics
-    INNER JOIN subtopics AS sub ON sub.topic_id = topics.id
+    LEFT JOIN subtopics AS sub ON sub.topic_id = topics.id
     GROUP BY topics.id, topics.name;`;
 
     let result = await DB.incubate(query);
