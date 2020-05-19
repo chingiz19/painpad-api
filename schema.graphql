@@ -15,6 +15,7 @@ type Query {
   sameHereUsers(postId: ID!): [ShortUser]!
   adminPendingPosts: [PendingPost]!
   adminAllTopics: [Topic]!
+  adminGetRejectReasons: [Pair!]!
 }
 
 type Mutation {
@@ -45,7 +46,6 @@ type Mutation {
   adminAddTopic(name: String!): ID!
   adminAddSubTopic(name: String!, topicId: ID!): ID!
   adminApprovePost(postId: ID!, subTopicId: ID!): Boolean!
-  adminGetRejectReasons: [Pair!]!
   adminAddRejectReason(reason: String!): ID!
   adminRejectPost(
     postId: ID!

@@ -21,5 +21,6 @@ module.exports = {
   userPendingPosts: Feed.pendingPosts,
   sameHereUsers: Feed.sameHereUsers,
   adminPendingPosts: Admin.pedningPosts,
-  adminAllTopics: Admin.allTopics
+  adminAllTopics: Admin.allTopics,
+  adminGetRejectReasons: Admin.getRejectReasons
 };

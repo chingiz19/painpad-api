@@ -174,7 +174,11 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
 
     let select = await DB.selectFromWhere('reject_reasons', ['id'], reasonId);
 
-    if (select) throw new Error('Given reason does not exist');
+    if (!select) throw new Error('Given reason does not exist');
+
+    let selectApproved = await DB.selectFromWhere('approved_posts', ['id'], [DB.whereObj('post_id', '=', postId)]);
+
+    if (selectApproved) throw new Error('Approved posts can not be rejected');
 
     let selectPost = await DB.selectFromWhere('posts', ['description', 'city_id', 'industry_id', 'created'], postId);
 

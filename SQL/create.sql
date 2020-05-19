@@ -91,7 +91,7 @@ CREATE TABLE rejected_posts (
  created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
  rejected       TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
  rejected_by    INTEGER                         NOT NULL    REFERENCES users(id),
- reson_id       INTEGER                         NOT NULL    REFERENCES reject_reasons(id),
+ reason_id      INTEGER                         NOT NULL    REFERENCES reject_reasons(id),
  explanation    TEXT,
  suggestion     TEXT
 );
