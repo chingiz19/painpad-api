@@ -187,7 +187,7 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
         industry_id: selectPost[0].industry_id,
         created: selectPost[0].created,
         reason_id: reasonId,
-        explanation?, suggestion?
+        explanation, suggestion
     }
 
     let insertPost = await DB.insertValuesIntoTable('rejected_posts', insertObj);
