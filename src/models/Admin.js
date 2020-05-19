@@ -1,4 +1,3 @@
-
 async function getAllTopics() {
     let query = `
     SELECT topics.id, topics.name, json_agg(json_build_object(

@@ -124,11 +124,14 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
         }
     }
 
-    let topicUsers = await Admin.getTopicUsers(subTopicPosts[0].topicId);
+    //if other posts exist
+    if (subTopicPosts.length > 0) {
+        let topicUsers = await Admin.getTopicUsers(subTopicPosts[0].topicId);
 
-    if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
+        if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    for (const { userId } of topicUsers) User.incrementScore(userId);
+        for (const { userId } of topicUsers) User.incrementScore(userId);
+    }
 
     let result = await DB.insertValuesIntoTable('approved_posts', { post_id: postId, subtopic_id: subTopicId });
 
@@ -142,4 +145,63 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
     return true;
 }
 
-module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost }
+async function getRejectReasons(parent, args, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let result = await DB.selectFrom('reject_reasons', ['id', 'description AS value']);
+
+    if (!result) throw new Error('Error while getting reject reasons');
+
+    return result;
+}
+
+async function addRejectReason(parent, { reason }, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let select = await DB.selectFromWhere('reject_reasons', ['id'], [DB.whereObj('description', '=', reason)]);
+
+    if (select) throw new Error('Given reason already exists');
+
+    let result = await DB.insertValuesIntoTable('reject_reasons', { description: reason });
+
+    if (!result) throw new Error('Error inserting into a table');
+
+    return result.id;
+}
+
+async function rejectPost(parent, { postId, reasonId, explanation, suggestion }, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let select = await DB.selectFromWhere('reject_reasons', ['id'], reasonId);
+
+    if (select) throw new Error('Given reason does not exist');
+
+    let selectPost = await DB.selectFromWhere('posts', ['description', 'city_id', 'industry_id', 'created'], postId);
+
+    if (!selectPost) throw new Error('Post does not exist');
+
+    let insertObj = {
+        rejected_by: req.session.user.id,
+        description: selectPost[0].description,
+        city_id: selectPost[0].city_id,
+        industry_id: selectPost[0].industry_id,
+        created: selectPost[0].created,
+        reason_id: reasonId,
+        explanation?, suggestion?
+    }
+
+    let insertPost = await DB.insertValuesIntoTable('rejected_posts', insertObj);
+
+    if (!insertPost) throw new Error('Error inserting into a table');
+
+    let deletePost = await DB.deleteFromWhere('posts', postId);
+
+    if (!deletePost) throw new Error('Error while deleting post from table');
+
+    //TODO: send push notification to user
+    //TODO: send email notification to user
+
+    return true;
+}
+
+module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost, getRejectReasons, addRejectReason, rejectPost }

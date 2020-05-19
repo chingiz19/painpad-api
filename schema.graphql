@@ -45,6 +45,14 @@ type Mutation {
   adminAddTopic(name: String!): ID!
   adminAddSubTopic(name: String!, topicId: ID!): ID!
   adminApprovePost(postId: ID!, subTopicId: ID!): Boolean!
+  adminGetRejectReasons: [Pair!]!
+  adminAddRejectReason(reason: String!): ID!
+  adminRejectPost(
+    postId: ID!
+    reasonId: ID!
+    explanation: String
+    suggestion: String
+  ): Boolean!
 }
 
 type Subscription {

@@ -58,7 +58,7 @@ CREATE TABLE topics (
 
 CREATE TABLE subtopics (
  id         SERIAL      PRIMARY KEY,
- name       TEXT        NOT NULL    UNIQUE,
+ name       TEXT        NOT NULL,
  topic_id   INTEGER     REFERENCES topics(id)
 );
 
@@ -135,3 +135,6 @@ INSERT INTO public.industries(name) VALUES ('Dentistry');
 
 INSERT INTO public.topics(name)                 VALUES ('Parking');
 INSERT INTO public.subtopics(name, topic_id)    VALUES ('Expensive', 1);
+
+INSERT INTO public.reject_reasons(description)    VALUES ('Incomplete Expression'), 
+('Age restricted topic'), ('Too much capittalisation'), ('Bad language'), ('Forbidden content');

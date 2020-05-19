@@ -16,5 +16,8 @@ module.exports = {
   adminAddTopic: Admin.addTopic,
   adminAddSubTopic: Admin.addSubTopic,
   adminApprovePost: Admin.approvePost,
-  removePost: Feed.removePost
+  removePost: Feed.removePost,
+  adminGetRejectReasons: Admin.getRejectReasons,
+  adminAddRejectReason: Admin.addRejectReason,
+  adminRejectPost: Admin.rejectPost
 };

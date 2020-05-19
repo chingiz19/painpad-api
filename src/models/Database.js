@@ -259,7 +259,7 @@ async function deleteFromWhere(table, inWhere, returning = ['*']) {
 
 }
 
-async function selectFrom(fromTable, columns) {
+async function selectFrom(fromTable, columns = ['*']) {
     let result;
 
     let query = `
