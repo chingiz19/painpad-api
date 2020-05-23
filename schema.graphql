@@ -16,7 +16,6 @@ type Query {
   adminAllTopics: [Topic]!
   adminGetRejectReasons: [Pair!]!
   topicStats(topicId: ID!): TopicStats!
-  topicPosts(topicId: ID!): [Post!]!
 }
 
 type Mutation {
@@ -151,8 +150,9 @@ type S3Response {
 }
 
 type TopicStats {
-  weights: TopicWeights!,
-  stats: SubTopicStats!
+  weights: TopicWeights!
+  subTopicStats: [SubTopicStats!]!
+  topicCountryStats: [TopicCountryStats!]!
 }
 
 type SubTopicStats {
@@ -163,8 +163,25 @@ type SubTopicStats {
   postCounts: Float!
 }
 
+type TopicCountryStats {
+  countryId: ID!
+  countryName: String!
+  postCount: Int!
+  sameHereCount: Float!
+}
+
 type TopicWeights {
-  postCountWeight: Float!
-  userPointWeight: Float!
-  sameHereWeight: Float!
+  subTopicWeights: subTopicWeights!
+  countryWeights: countryWeights!
+}
+
+type subTopicWeights {
+  postCount: Float!
+  userPoint: Float!
+  sameHere: Float!
+}
+
+type countryWeights {
+  postCount: Float!
+  sameHere: Float!
 }

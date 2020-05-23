@@ -23,6 +23,5 @@ module.exports = {
   adminPendingPosts: Admin.pedningPosts,
   adminAllTopics: Admin.allTopics,
   adminGetRejectReasons: Admin.getRejectReasons,
-  topicStats: Topic.getTopicStats,
-  topicPosts: Topic.getTopicPosts
+  topicStats: Topic.getTopicStats
 };

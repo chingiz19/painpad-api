@@ -78,7 +78,7 @@ async function pendingPosts(parent, args, { req }) {
     return result;
 }
 
-async function removePost(parent, { postId }, { req }) {
+async function removePost(parent, { postId }, { req }) {  //TODO: remove from same_heres as well
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const table = 'posts';

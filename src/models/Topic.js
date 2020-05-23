@@ -1,11 +1,10 @@
-async function subtopicStats(topicId) {
+async function subTopicStats(topicId) {
     let query = `
-    SELECT json_build_object(
-            'subTopicId', ap.subtopic_id,
-            'subTopicName', subtopics.name,
-            'sameHeres', COALESCE(SUM(post_same_heres.count), 0),
-            'userPoints', SUM(users.score),
-            'postCounts', COUNT(ap.id)) AS stats
+    SELECT 	
+        ap.subtopic_id AS "subTopicId", subtopics.name AS "subTopicName",
+        COALESCE(SUM(post_same_heres.count), 0) AS "sameHeres",
+        SUM(users.score) AS "userPoints",
+        COUNT(ap.id) AS "postCounts"
     FROM public.posts
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN users ON users.id = posts.user_id
@@ -15,11 +14,34 @@ async function subtopicStats(topicId) {
     WHERE subtopics.topic_id = $1
     GROUP BY ap.subtopic_id, subtopics.name;`;
 
-    let result = await DB.incubate(query, [topicId]);
-
-    if (!result) return false;
-
-    return result[0].stats || [];
+    return await DB.incubate(query, [topicId]);
 }
 
-module.exports = { subtopicStats }
+async function topicCountryStats(topicId) {
+    let query = `
+    SELECT countries.id AS "countryId", countries.name AS "countryName", COUNT(posts.id) AS "postCount", COALESCE (same_heres.count, 0) AS "sameHereCount"
+    FROM public.posts  
+    INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
+    INNER JOIN subtopics ON subtopics.id = ap.subtopic_id
+    INNER JOIN cities ON posts.city_id = cities.id
+    INNER JOIN states ON states.id = cities.state_id
+    INNER JOIN countries ON countries.id = states.country_id
+    LEFT JOIN (
+        SELECT countries.id AS country_id, COUNT(same_heres.user_id)
+        FROM same_heres
+        INNER JOIN posts ON posts.id = same_heres.post_id
+        INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
+        INNER JOIN subtopics ON subtopics.id = ap.subtopic_id
+        INNER JOIN users ON users.id = same_heres.user_id
+        INNER JOIN cities ON posts.city_id = cities.id
+        INNER JOIN states ON states.id = cities.state_id
+        INNER JOIN countries ON countries.id = states.country_id
+        WHERE subtopics.topic_id = $1
+        GROUP BY 1) AS same_heres ON same_heres.country_id = countries.id
+    WHERE subtopics.topic_id = $1
+    GROUP BY 1, 2, 4;`;
+
+    return await DB.incubate(query, [topicId]);
+}
+
+module.exports = { subTopicStats, topicCountryStats }
