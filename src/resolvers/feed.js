@@ -78,7 +78,7 @@ async function pendingPosts(parent, args, { req }) {
     return result;
 }
 
-async function removePost(parent, { postId }, { req }) {  //TODO: remove from same_heres as well
+async function removePost(parent, { postId }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const table = 'posts';
@@ -92,7 +92,11 @@ async function removePost(parent, { postId }, { req }) {  //TODO: remove from sa
 
     let deleteApproved = await DB.deleteFromWhere('approved_posts', [DB.whereObj('post_id', '=', postId)]);
 
-    if (!deleteApproved) console.log('Deleting pending post', postId, 'for user', userId)
+    if (!deleteApproved) console.log('Deleting post -> approved_posts is empty');
+
+    let deleteSameHere = await DB.deleteFromWhere('same_heres', [DB.whereObj('post_id', '=', postId)]);
+
+    if (!deleteSameHere) console.log('Deleting post -> same_heres is empty');
 
     let result = await DB.deleteFromWhere(table, postId);
 
