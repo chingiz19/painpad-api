@@ -7,15 +7,16 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
-  userPosts(userId: ID!): [Post]!
+  posts(userId: ID, topicId: ID, lastDate: Float, count: Int): [Post]!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
-  userFeed(lastDate: Float, count: Int): [Post]!
   userPendingPosts: [PendingPost]!
   sameHereUsers(postId: ID!): [ShortUser]!
   adminPendingPosts: [PendingPost]!
   adminAllTopics: [Topic]!
   adminGetRejectReasons: [Pair!]!
+  topicStats(topicId: ID!): TopicStats!
+  topicPosts(topicId: ID!): [Post!]!
 }
 
 type Mutation {
@@ -147,4 +148,23 @@ type AuthRes {
 type S3Response {
   uploadUrl: String!
   fileUrl: String!
+}
+
+type TopicStats {
+  weights: TopicWeights!,
+  stats: SubTopicStats!
+}
+
+type SubTopicStats {
+  subTopicId: ID!
+  subTopicName: String!
+  sameHeres: Float!
+  userPoints: Float!
+  postCounts: Float!
+}
+
+type TopicWeights {
+  postCountWeight: Float!
+  userPointWeight: Float!
+  sameHereWeight: Float!
 }

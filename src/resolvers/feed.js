@@ -20,10 +20,10 @@ async function post(parent, { description, cityId, industryId }, { req }) {
     return true;
 }
 
-async function userFeed(parent, { lastDate, count }, { req }) {
+async function posts(parent, { userId, topicId, lastDate, count }, { req }) {
     let firstPersonId = (req.session.user && req.session.user.id) || 0;
 
-    let result = await Feed.getUserFeed(firstPersonId, null, count, lastDate);
+    let result = await Feed.getUserFeed(firstPersonId, { userId, topicId }, count, lastDate);
 
     if (!result) throw new Error('Error while getting news feed');
 
@@ -101,4 +101,4 @@ async function removePost(parent, { postId }, { req }) {
     return true;
 }
 
-module.exports = { post, userFeed, pendingPosts, sameHereUsers, sameHere, removePost }
+module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost }

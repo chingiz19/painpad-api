@@ -80,16 +80,6 @@ async function stats(parent, { userId }, { req }) {
     return { following, followers }
 }
 
-async function posts(parent, { userId }, { req }) {
-    let firstPersonId = (req.session.user &&  req.session.user.id) || 0;
-
-    let result = await Feed.getUserFeed(firstPersonId, userId);
-
-    if (!result) throw new Error(GENERIC_ERRROR);
-
-    return result;
-}
-
 async function changeProfile(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
@@ -194,4 +184,4 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
     return true;
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword, unFollow, resetPwd };
+module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd };

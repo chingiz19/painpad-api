@@ -1,4 +1,4 @@
-async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
+async function getUserFeed(firstPersonId, { userId, topicId }, count = 20, lastDate) {
     let whereStr = '';
     let whereArr = [];
     let counter = 1;
@@ -13,6 +13,12 @@ async function getUserFeed(firstPersonId, userId, count = 20, lastDate) {
     if (userId) {
         whereArr.push(`posts.user_id=$${counter}`);
         params.push(userId);
+        counter++;
+    }
+
+    if (topicId) {
+        whereArr.push(`topics.id=$${counter}`);
+        params.push(topicId);
         counter++;
     }
 
