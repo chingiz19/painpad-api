@@ -293,16 +293,21 @@ async function selectFrom(fromTable, columns = ['*']) {
         useRaw: true/false  means insert into query as text
     }];
  */
-async function selectFromWhere(fromTable, columns, inWhere, groupBy) {
+async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined } = {} ) {
     let where;
     let whereClause = [];
     let params = [];
     let counter = 1;
     let result;
-    let groupByClause = '';
+    let additionalSQL = '';
 
     if (groupBy) {
-        groupByClause = `GROUP BY ${groupBy.join(', ')}`;
+        additionalSQL = `GROUP BY ${groupBy.join(', ')}`;
+    }
+
+    if (limit) {
+        additionalSQL += ` LIMIT $${counter}`
+        params.push(limit);
     }
 
     if (Array.isArray(inWhere)) {
@@ -338,7 +343,7 @@ async function selectFromWhere(fromTable, columns, inWhere, groupBy) {
         ${fromTable}
     WHERE
         ${whereClause.join(' AND ')}
-    ${groupByClause};`;
+    ${additionalSQL};`;
 
     try {
         result = await connection.query({

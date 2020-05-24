@@ -33,7 +33,7 @@ async function getUserFeed(firstPersonId, { userId, topicId }, count = 20, lastD
             'industry', INITCAP(industries.name),
             'approved', extract(epoch from ap.approved) * 1000,
             'topic', json_build_object('id', topics.id, 'name', INITCAP(topics.name)),
-            'location', cities.name || ', ' || countries.name,
+            'location', cities.name || ', ' || countries.short_name,
             'sameHere', COALESCE(sh.count, 0),
             'sameHered', COALESCE(sh.same_hered, FALSE),
             'postedBy', users.obj
@@ -87,7 +87,7 @@ async function getPendingPosts(userId) {
             'description', posts.description,
             'created', extract(epoch from posts.created) * 1000,
             'industry', INITCAP(industries.name),
-            'location', cities.name || ', ' || countries.name,
+            'location', cities.name || ', ' || countries.short_name,
             'postedBy', users.obj
         ) ORDER BY COALESCE(ap.approved, posts.created)) AS posts
     FROM posts

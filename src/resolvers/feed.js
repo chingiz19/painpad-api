@@ -82,7 +82,7 @@ async function removePost(parent, { postId }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const table = 'posts';
-    let userId = req.session.user.id;
+    const userId = req.session.user.id;
 
     let select = await DB.selectFromWhere(table, ['user_id'], postId);
 
@@ -105,4 +105,28 @@ async function removePost(parent, { postId }, { req }) {
     return true;
 }
 
-module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost }
+async function notificationCount(parent, args, { req }) {  //TODO: needs testing
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    const userId = req.session.user.id;
+
+    let result = await DB.selectFromWhere('notifications', ['COUNT(id)'], [DB.whereObj('user_id', '=', userId)]);
+
+    if (!result) throw new Error('Unexpected error while getting notifications count');
+
+    return result[0].count || 0;
+}
+
+async function notifications(parent, { limit }, { req }) { //TODO: needs testing
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    const userId = req.session.user.id;
+
+    let result = await DB.selectFromWhere('notifications', ['*'], [DB.whereObj('user_id', '=', userId)], { limit });
+
+    if (!result) throw new Error('Unexpected error while getting notifications from DB');
+
+    return result;
+}
+
+module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost, notifications, notificationCount }

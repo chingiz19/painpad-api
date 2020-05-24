@@ -16,6 +16,8 @@ type Query {
   adminAllTopics: [Topic]!
   adminGetRejectReasons: [Pair!]!
   topicStats(topicId: ID!): TopicStats!
+  notificationCount: Int!
+  notifications(limit: Int): [Notification!]!
 }
 
 type Mutation {
@@ -56,8 +58,8 @@ type Mutation {
 }
 
 type Subscription {
-  newPost: Post
-  notification: Notification
+  newPost: Post!
+  notificationCount: Int!
 }
 
 type Topic {
@@ -136,6 +138,7 @@ type Notification {
   id: ID!
   descrption: String!
   created: Float!
+  action: String!
   icon: String!
 }
 
@@ -150,6 +153,7 @@ type S3Response {
 }
 
 type TopicStats {
+  topicName: String!
   weights: TopicWeights!
   subTopicStats: [SubTopicStats!]!
   topicCountryStats: [TopicCountryStats!]!

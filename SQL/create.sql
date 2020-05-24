@@ -20,6 +20,7 @@ CREATE TABLE regions (
 CREATE TABLE countries (
  id             SERIAL      PRIMARY KEY,
  name           TEXT        NOT NULL,
+ short_name     TEXT        NOT NULL,
  region_id      INTEGER     REFERENCES regions(id)
 );
 
@@ -111,6 +112,7 @@ CREATE TABLE follows (
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
  description    TEXT                            NOT NULL    UNIQUE,
+ action         TEXT,
  user_id        INTEGER                         REFERENCES users(id),
  created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'

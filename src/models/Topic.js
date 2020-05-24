@@ -19,7 +19,7 @@ async function subTopicStats(topicId) {
 
 async function topicCountryStats(topicId) {
     let query = `
-    SELECT countries.id AS "countryId", countries.name AS "countryName", COUNT(posts.id) AS "postCount", COALESCE (same_heres.count, 0) AS "sameHereCount"
+    SELECT countries.id AS "countryId", countries.short_name AS "countryName", COUNT(posts.id) AS "postCount", COALESCE (same_heres.count, 0) AS "sameHereCount"
     FROM public.posts  
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = ap.subtopic_id

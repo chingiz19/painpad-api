@@ -12,7 +12,7 @@ async function getUserInformation(userId) {
             'profilePic', profile_pic,
             'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'Please select')),
             'industry', json_build_object('id', industries.id, 'value', industries.name),
-            'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || countries.name),
+            'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || countries.short_name),
             'since',  extract(epoch from since) * 1000
         ) AS info
     FROM users

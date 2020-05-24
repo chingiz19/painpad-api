@@ -16,6 +16,10 @@ const WEIGHTS = {
 async function getTopicStats(parent, { topicId }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
+    let topicResult = await DB.selectFromWhere('topics', ['name'], topicId);
+
+    if (!topicResult) throw new Error('Error while retrieving topic stats');
+
     let subTopicStats = await Topic.subTopicStats(topicId);
 
     if (!subTopicStats) throw new Error('Error while retrieving topic stats');
@@ -26,6 +30,7 @@ async function getTopicStats(parent, { topicId }, { req }) {
 
     return {
         subTopicStats,
+        topicName: topicResult[0].name,
         topicCountryStats,
         weights : WEIGHTS
     }
