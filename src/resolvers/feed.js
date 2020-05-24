@@ -122,7 +122,9 @@ async function notifications(parent, { limit }, { req }) {
 
     const userId = req.session.user.id;
 
-    let result = await DB.selectFromWhere('notifications', ['*'], [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1 });
+    let columns = [ 'id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen' ]
+
+    let result = await DB.selectFromWhere('notifications', columns, [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1 });
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
 

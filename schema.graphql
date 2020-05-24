@@ -136,10 +136,11 @@ type Pair {
 
 type Notification {
   id: ID!
-  descrption: String!
+  description: String!
   created: Float!
-  action: String!
   icon: String!
+  seen: Float
+  action: String
 }
 
 type AuthRes {

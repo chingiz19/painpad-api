@@ -111,10 +111,11 @@ CREATE TABLE follows (
 
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
- description    TEXT                            NOT NULL    UNIQUE,
+ user_id        INTEGER                         NOT NULL    REFERENCES users(id),
+ description    TEXT                            NOT NULL,
  action         TEXT,
- user_id        INTEGER                         REFERENCES users(id),
- created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+ seen           TIMESTAMP WITHOUT TIME ZONE,
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
 

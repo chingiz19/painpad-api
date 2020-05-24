@@ -121,7 +121,7 @@ async function dropTable(tableName) {
  * Updates values in the table and auto generates parameters for 'pg'
  * 
  * @param {*} tableName table name
- * @param {*} inWhere can be and id or array of objects -> same as selectFromWhere
+ * @param {*} inWhere can be and id or array of objects -> same as above
  * @param {*} data update data where {column: value (to update to)}
  * @param {*} returning returning condition
  */
