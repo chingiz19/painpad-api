@@ -162,9 +162,9 @@ type TopicStats {
 type SubTopicStats {
   subTopicId: ID!
   subTopicName: String!
-  sameHeres: Float!
+  sameHereCount: Float!
   userPoints: Float!
-  postCounts: Float!
+  postCount: Float!
 }
 
 type TopicCountryStats {

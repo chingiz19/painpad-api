@@ -105,7 +105,7 @@ async function removePost(parent, { postId }, { req }) {
     return true;
 }
 
-async function notificationCount(parent, args, { req }) {  //TODO: needs testing
+async function notificationCount(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
@@ -117,12 +117,12 @@ async function notificationCount(parent, args, { req }) {  //TODO: needs testing
     return result[0].count || 0;
 }
 
-async function notifications(parent, { limit }, { req }) { //TODO: needs testing
+async function notifications(parent, { limit }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
 
-    let result = await DB.selectFromWhere('notifications', ['*'], [DB.whereObj('user_id', '=', userId)], { limit });
+    let result = await DB.selectFromWhere('notifications', ['*'], [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1 });
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
 

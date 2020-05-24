@@ -2,9 +2,9 @@ async function subTopicStats(topicId) {
     let query = `
     SELECT 	
         ap.subtopic_id AS "subTopicId", subtopics.name AS "subTopicName",
-        COALESCE(SUM(post_same_heres.count), 0) AS "sameHeres",
+        COALESCE(SUM(post_same_heres.count), 0) AS "sameHereCount",
         SUM(users.score) AS "userPoints",
-        COUNT(ap.id) AS "postCounts"
+        COUNT(ap.id) AS "postCount"
     FROM public.posts
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN users ON users.id = posts.user_id

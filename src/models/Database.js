@@ -293,12 +293,11 @@ async function selectFrom(fromTable, columns = ['*']) {
         useRaw: true/false  means insert into query as text
     }];
  */
-async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined } = {} ) {
+async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined, rowCount = 0 } = {} ) {
     let where;
     let whereClause = [];
     let params = [];
     let counter = 1;
-    let result;
     let additionalSQL = '';
 
     if (groupBy) {
@@ -346,16 +345,16 @@ async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefine
     ${additionalSQL};`;
 
     try {
-        result = await connection.query({
+        let result = await connection.query({
             text: query,
             values: params
         });
+
+        if (result && result.rows && result.rows.length > rowCount) {
+            return result.rows;
+        }
     } catch (error) {
         console.error('Error => db.selectFrom()', error.message);
-    }
-
-    if (result && result.rows && result.rows.length > 0) {
-        return result.rows;
     }
 
     return false;
