@@ -32,8 +32,9 @@ async function getUserFeed(firstPersonId, { userId, topicId }, count = 20, lastD
             'created', extract(epoch from posts.created) * 1000,
             'industry', INITCAP(industries.name),
             'approved', extract(epoch from ap.approved) * 1000,
-            'topic', json_build_object('id', topics.id, 'name', INITCAP(topics.name)),
-            'location', cities.name || ', ' || countries.short_name,
+            'subTopic', json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)),
+            'location',  json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
+                                            'countryId', countries.id, 'countryName', countries.short_name),
             'sameHere', COALESCE(sh.count, 0),
             'sameHered', COALESCE(sh.same_hered, FALSE),
             'postedBy', users.obj

@@ -72,6 +72,7 @@ type subTopic {
   id: ID
   description: String
   topicId: ID
+  topicName: String
 }
 
 type Profile {
@@ -113,9 +114,9 @@ type Post {
   postedBy: ShortUser!
   created: Float!
   industry: String!
-  location: String!
+  location: Location!
+  subTopic: subTopic!
   approved: Float!
-  topic: Topic!
   sameHere: Int!
   sameHered: Boolean!
 }
@@ -132,6 +133,15 @@ type PendingPost {
 type Pair {
   id: ID!
   value: String!
+}
+
+type Location {
+  countryId: ID!
+  countryName: String!
+  stateId: ID!
+  stateName: String!
+  cityId: ID!
+  cityName: String!
 }
 
 type Notification {

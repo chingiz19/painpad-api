@@ -2,7 +2,6 @@ const { PubSub } = require("graphql-subscriptions");
 
 const pubsub = new PubSub();
 
-
 const SUBCRIPTION_CHANNELS = {
     NOTIFICATION_COUNT: 'HVl3SHgqqH',
     NEW_POST: 'TCCCqmg6Rg'

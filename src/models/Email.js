@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 const Auth = require('./Auth');
 
-const RESET_PASSWORD_LINK = 'http://localhost:3000/resetPass/';  //TODO: change this to actual production link one Elnar is done testing
+const RESET_PASSWORD_LINK = 'https://painpad.co/resetPass/';
 
 const FROM_ADDRESS = 'hello@painpad.co';
 const FROM_NAME = 'PainPad Inc.';
@@ -39,6 +39,12 @@ async function resetPassword(parent, { email }, { req }) {
     return true;
 }
 
+/**
+ * Sends email through sendGrid
+ * @param {*} to to address
+ * @param {*} template_id sendGrid template ID
+ * @param {*} dynamic_template_data data used in the template
+ */
 async function sendEmail(to, template_id, dynamic_template_data) {
     const msg = {
         to, template_id, dynamic_template_data,

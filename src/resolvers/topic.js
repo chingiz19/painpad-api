@@ -14,8 +14,6 @@ const WEIGHTS = {
 }
 
 async function getTopicStats(parent, { topicId }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
-
     let topicResult = await DB.selectFromWhere('topics', ['name'], topicId);
 
     if (!topicResult) throw new Error('Error while retrieving topic stats');

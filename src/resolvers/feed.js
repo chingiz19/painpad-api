@@ -53,7 +53,9 @@ async function sameHere(parent, { postId, add }, { req }) {
 
     if (!result) throw new Error('Error while getting news feed');
 
-    //TODO: send notification to user about same here
+    if (sendNotification) {
+        //TODO: send notification to user about same here
+    }
 
     return true;
 }
@@ -122,7 +124,7 @@ async function notifications(parent, { limit }, { req }) {
 
     const userId = req.session.user.id;
 
-    let columns = [ 'id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen' ]
+    let columns = ['id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen']
 
     let result = await DB.selectFromWhere('notifications', columns, [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1 });
 

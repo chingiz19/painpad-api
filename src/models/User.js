@@ -1,4 +1,5 @@
 const DB = require('./Database');
+const Subscriptions = require('../models/Subscriptions');
 
 async function getUserInformation(userId) {
     let query = `
@@ -83,11 +84,15 @@ async function changeUserProfile(userId, args) {
     return await DB.updateValuesInTable('users', userId, updates);
 }
 
-async function incrementScore(userId, score = 1) {
+async function incrementScore(userId, score = 1) { //TODO: finish the bug
     let result = await DB.updateValuesInTable('users', userId, { score });
 
-    if (result) console.log('Pushing', score, 'points to user', userId);
-    //TODO: notify user
+    if (!result) {
+        console.error('Error while incrementing score:', score, 'for user', userId);
+        return false;
+    }
+
+    Subscriptions.notify(userId, { description: '', action: `/users/${userId}` });
 
     return result;
 }
