@@ -1,3 +1,4 @@
+const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const Admin = require('../models/Admin');
 const User = require('../models/User');
@@ -139,8 +140,9 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     User.incrementScore(currentUserId, postUserTotalScore);
 
-    //TODO: send push notification about being approved and total score
-    //TODO: send email notification about being approved and total score
+    Subscriptions.notify(currentUserId, { description: `Congrats! Your post has been has been approved by moderators`, action: `/posts/${postId}` });
+
+    Subscriptions.newPost(postId);
 
     return true;
 }
@@ -172,9 +174,9 @@ async function addRejectReason(parent, { reason }, { req }) {
 async function rejectPost(parent, { postId, reasonId, explanation, suggestion }, { req }) {
     if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
 
-    let select = await DB.selectFromWhere('reject_reasons', ['id'], reasonId);
+    let selectReason = await DB.selectFromWhere('reject_reasons', ['description'], reasonId);
 
-    if (!select) throw new Error('Given reason does not exist');
+    if (!selectReason) throw new Error('Given reason does not exist');
 
     let selectApproved = await DB.selectFromWhere('approved_posts', ['id'], [DB.whereObj('post_id', '=', postId)]);
 
@@ -202,7 +204,11 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
 
     if (!deletePost) throw new Error('Error while deleting post from table');
 
-    //TODO: send push notification to user
+    const rejectReason = selectReason[0].description;
+    const rejectedPostId = insertPost[0].id;
+
+    Subscriptions.notify(userId, { description: `Your post has been has been rejected. Reason: ${rejectReason}`, action: `/posts/${rejectedPostId}?rejected=true` });
+
     //TODO: send email notification to user
 
     return true;

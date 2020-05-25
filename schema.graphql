@@ -7,7 +7,7 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
-  posts(userId: ID, topicId: ID, lastDate: Float, count: Int): [Post]!
+  posts(userId: ID, topicId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
   userPendingPosts: [PendingPost]!
@@ -16,7 +16,7 @@ type Query {
   adminAllTopics: [Topic]!
   adminGetRejectReasons: [Pair!]!
   topicStats(topicId: ID!): TopicStats!
-  notificationCount: Int!
+  newNotificationCount: Int!
   notifications(limit: Int): [Notification!]!
 }
 
@@ -59,7 +59,7 @@ type Mutation {
 
 type Subscription {
   newPost: Post!
-  notificationCount: Int!
+  newNotificationCount: Int!
 }
 
 type Topic {

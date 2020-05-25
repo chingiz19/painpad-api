@@ -1,5 +1,5 @@
 const { PubSub } = require("graphql-subscriptions");
-
+const Feed = require('../models/Feed');
 const pubsub = new PubSub();
 
 const SUBCRIPTION_CHANNELS = {
@@ -7,11 +7,7 @@ const SUBCRIPTION_CHANNELS = {
     NEW_POST: 'TCCCqmg6Rg'
 }
 
-function subscribe(userId, type) {
-    const channel = type + userId;
-
-    setTimeout(() => notify(1, { description: 'Some random description' }), 3000);
-
+function subscribe(channel) {
     return pubsub.asyncIterator(channel);
 }
 
@@ -30,17 +26,17 @@ async function notify(userId, { description, action }) {
 
     if (!result) return console.error('Error while inserting into DB notifications count');
 
-    const countResult = await DB.selectFromWhere(table, ['COUNT(id)'], [DB.whereObj('user_id', '=', userId), DB.whereObj('seen', 'IS', 'NULL', true)]);
+    const newCount = await Feed.getNewNotificationCount(userId);
 
-    if (!countResult) return console.error('Error while retrieving the notification count');
-
-    return pubsub.publish(channel, { notificationCount: countResult[0].count });
+    return pubsub.publish(channel, { newNotificationCount: newCount });
 }
 
-async function newPost(userId, post) {
-    const channel = SUBCRIPTION_CHANNELS.NEW_POST + userId;
+async function newPost(postId) {
+    const postResult = await Feed.getUserFeed(0, { postId });
 
-    return pubsub.publish(channel, { post })
+    if (!postResult) return console.error('Error while retrieving post info for publish (newPost subscription)');
+
+    return pubsub.publish(SUBCRIPTION_CHANNELS.NEW_POST, { post: postResult[0] })
 }
 
 module.exports = { subscribe, notify, newPost, SUBCRIPTION_CHANNELS }

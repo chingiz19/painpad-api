@@ -1,3 +1,4 @@
+const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const User = require('../models/User');
 const Feed = require('../models/Feed');
@@ -104,11 +105,17 @@ async function follow(parent, { userIdToFollow }, { req }) {
         follows: userIdToFollow
     }
 
-    //TODO: notify user that is being followed (label -> notification)
-
     let result = await DB.insertValuesIntoTable('follows', insertData);
 
     if (!result) throw new Error(GENERIC_ERRROR);
+
+    const userResult = await DB.selectFromWhere('users', [`INITCAP(first_name) || ' ' || INITCAP(last_name) AS name`], userId);
+
+    if (!userResult) throw new Error('Error while implementing an action');
+
+    const userName = userResult[0].name;
+
+    Subscriptions.notify(userIdToFollow, { description: `${userName} started following you`, action: `/users/${userId}` });
 
     return true
 }
@@ -179,7 +186,7 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
-    //TODO: notify via email that user's password has been changed
+    //TODO: send email that user's password has been changed
 
     return true;
 }

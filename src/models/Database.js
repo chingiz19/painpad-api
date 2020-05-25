@@ -125,7 +125,7 @@ async function dropTable(tableName) {
  * @param {*} data update data where {column: value (to update to)}
  * @param {*} returning returning condition
  */
-async function updateValuesInTable(tableName, inWhere, data, returning = ['*']) {
+async function updateValuesInTable(tableName, inWhere, data, { returning = ['*'], rowCount = 0 } = {}) {
     let result;
     let where;
     let whereClause = [];
@@ -184,7 +184,7 @@ async function updateValuesInTable(tableName, inWhere, data, returning = ['*']) 
         console.error('Error => db.updateValuesInTable()', error.message);
     }
 
-    if (result && result.rows && result.rows.length > 0) {
+    if (result && result.rows && result.rows.length > rowCount) {
         return result.rows;
     }
 
@@ -293,7 +293,7 @@ async function selectFrom(fromTable, columns = ['*']) {
         useRaw: true/false  means insert into query as text
     }];
  */
-async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined, rowCount = 0 } = {} ) {
+async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined, rowCount = 0, orderBy =undefined } = {}) {
     let where;
     let whereClause = [];
     let params = [];
@@ -302,6 +302,10 @@ async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefine
 
     if (groupBy) {
         additionalSQL = `GROUP BY ${groupBy.join(', ')}`;
+    }
+
+    if (orderBy) {
+        additionalSQL = `ORDER BY ${orderBy}`;
     }
 
     if (limit) {

@@ -1,5 +1,5 @@
 const DB = require('./Database');
-const Subscriptions = require('../models/Subscriptions');
+const Subscriptions = require('./Subscriptions');
 
 async function getUserInformation(userId) {
     let query = `
@@ -84,15 +84,25 @@ async function changeUserProfile(userId, args) {
     return await DB.updateValuesInTable('users', userId, updates);
 }
 
-async function incrementScore(userId, score = 1) { //TODO: finish the bug
-    let result = await DB.updateValuesInTable('users', userId, { score });
+async function incrementScore(userId, incrementBy = 1) {
+    let select = await DB.selectFromWhere('users', ['score'], userId);
+
+    if (!select) {
+        console.error('Error while retrieving users', userId, 'score');
+        return false;
+    }
+
+    const currentScore = select[0].score;
+    const updatedScore = currentScore + incrementBy;
+
+    let result = await DB.updateValuesInTable('users', userId, { score: updatedScore });
 
     if (!result) {
         console.error('Error while incrementing score:', score, 'for user', userId);
         return false;
     }
 
-    Subscriptions.notify(userId, { description: '', action: `/users/${userId}` });
+    Subscriptions.notify(userId, { description: `Your score has been promoted from ${currentScore} to ${updatedScore}`, action: `/users/${userId}` });
 
     return result;
 }

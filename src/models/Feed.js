@@ -1,4 +1,4 @@
-async function getUserFeed(firstPersonId, { userId, topicId }, count = 20, lastDate) {
+async function getUserFeed(firstPersonId, { userId, topicId, postId }, count = 20, lastDate) {
     let whereStr = '';
     let whereArr = [];
     let counter = 1;
@@ -19,6 +19,12 @@ async function getUserFeed(firstPersonId, { userId, topicId }, count = 20, lastD
     if (topicId) {
         whereArr.push(`topics.id=$${counter}`);
         params.push(topicId);
+        counter++;
+    }
+
+    if (postId) {
+        whereArr.push(`posts.id=$${counter}`);
+        params.push(postId);
         counter++;
     }
 
@@ -143,4 +149,12 @@ async function sameHereUsers(postId) {
     return result[0].users || [];
 }
 
-module.exports = { getUserFeed, sameHereUsers, getPendingPosts }
+async function getNewNotificationCount(userId) {
+    let result = await DB.selectFromWhere('notifications', ['COUNT(id)'], [DB.whereObj('user_id', '=', userId), DB.whereObj('seen', 'IS', 'NULL', true)]);
+
+    if (!result) return false;
+
+    return result[0].count || 0
+}
+
+module.exports = { getUserFeed, sameHereUsers, getPendingPosts, getNewNotificationCount }

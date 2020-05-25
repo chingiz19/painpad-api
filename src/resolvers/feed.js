@@ -1,3 +1,4 @@
+const Subscriptions = require('../models/Subscriptions');
 const Feed = require('../models/Feed');
 const Auth = require('../models/Auth');
 
@@ -20,10 +21,10 @@ async function post(parent, { description, cityId, industryId }, { req }) {
     return true;
 }
 
-async function posts(parent, { userId, topicId, lastDate, count }, { req }) {
+async function posts(parent, { userId, topicId, postId, lastDate, count }, { req }) {
     let firstPersonId = (req.session.user && req.session.user.id) || 0;
 
-    let result = await Feed.getUserFeed(firstPersonId, { userId, topicId }, count, lastDate);
+    let result = await Feed.getUserFeed(firstPersonId, { userId, topicId, postId }, count, lastDate);
 
     if (!result) throw new Error('Error while getting news feed');
 
@@ -51,10 +52,16 @@ async function sameHere(parent, { postId, add }, { req }) {
         result = await DB.deleteFromWhere(tableName, where);
     }
 
-    if (!result) throw new Error('Error while getting news feed');
+    if (!result) throw new Error('Error while implementing an action');
 
     if (sendNotification) {
-        //TODO: send notification to user about same here
+        const userResult = await DB.selectFromWhere('users', [`INITCAP(first_name) || ' ' || INITCAP(last_name) AS name`], userId);
+
+        if (!userResult) throw new Error('Error while implementing an action');
+
+        const userName = userResult[0].name;
+
+        Subscriptions.notify(userId, { description: `Yeah! ${userName} just agreed with your posting`, action: `/posts/${postId}` });
     }
 
     return true;
@@ -107,30 +114,34 @@ async function removePost(parent, { postId }, { req }) {
     return true;
 }
 
-async function notificationCount(parent, args, { req }) {
+async function newNotificationCount(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
 
-    let result = await DB.selectFromWhere('notifications', ['COUNT(id)'], [DB.whereObj('user_id', '=', userId)]);
+    const newCount = await Feed.getNewNotificationCount(userId);
 
-    if (!result) throw new Error('Unexpected error while getting notifications count');
+    if (!newCount) throw new Error('Unexpected error while getting notifications count');
 
-    return result[0].count || 0;
+    return newCount;
 }
 
 async function notifications(parent, { limit }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
+    const table = 'notifications';
+    const columns = ['id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen']
 
-    let columns = ['id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen']
-
-    let result = await DB.selectFromWhere('notifications', columns, [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1 });
+    const result = await DB.selectFromWhere(table, columns, [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1, orderBy: 'created DESC' });
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
+
+    const update = await DB.updateValuesInTable(table, [DB.whereObj('seen', 'IS', 'NULL', true)], { seen: 'now()' }, { rowCount: -1 });
+
+    if (!update) throw new Error('Unexpected error while getting notifications from DB');
 
     return result;
 }
 
-module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost, notifications, notificationCount }
+module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost, notifications, newNotificationCount }

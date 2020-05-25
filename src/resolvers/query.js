@@ -24,6 +24,6 @@ module.exports = {
   adminAllTopics: Admin.allTopics,
   adminGetRejectReasons: Admin.getRejectReasons,
   topicStats: Topic.getTopicStats,
-  notificationCount: Feed.notificationCount,
+  newNotificationCount: Feed.newNotificationCount,
   notifications: Feed.notifications
 };
