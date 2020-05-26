@@ -59,9 +59,16 @@ async function sameHere(parent, { postId, add }, { req }) {
 
         if (!userResult) throw new Error('Error while implementing an action');
 
-        const userName = userResult[0].name;
+        const postUserResult = await DB.selectFromWhere('posts', [`user_id`], postId);
 
-        Subscriptions.notify(userId, { description: `Yeah! ${userName} just agreed with your posting`, action: `/posts/${postId}` });
+        if (!postUserResult) throw new Error('Error while implementing an action');
+
+        const userName = userResult[0].name;
+        const postUserId = postUserResult[0].user_id;
+
+        if (postUserId !== userId) {
+            Subscriptions.notify(postUserId, { description: `Yeah! ${userName} just agreed with your posting`, action: `/posts/${postId}` });
+        }
     }
 
     return true;

@@ -94,11 +94,6 @@ type User {
   score: Int!
 }
 
-type UserStats {
-  following: [ShortUser]!
-  followers: [ShortUser]!
-}
-
 type ShortUser {
   id: ID!
   firstName: String!
@@ -106,6 +101,11 @@ type ShortUser {
   profilePic: String!
   industry: String!
   occupation: String
+}
+
+type UserStats {
+  following: [ShortUser]!
+  followers: [ShortUser]!
 }
 
 type Post {

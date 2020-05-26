@@ -109,15 +109,34 @@ CREATE TABLE follows (
  follows    INTEGER     REFERENCES users(id)
 );
 
+CREATE TABLE notification_types (
+ id                 SERIAL      PRIMARY KEY,
+ background_color   TEXT        NOT NULL,
+ color              TEXT        NOT NULL,
+ is_user_icon       BOOLEAN     NOT NULL    DEFAULT FALSE,
+ description        TEXT        NOT NULL,
+ icon               TEXT
+);
+
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
  user_id        INTEGER                         NOT NULL    REFERENCES users(id),
+ type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
+ header         TEXT                            NOT NULL,
+ subheader      TEXT                            NOT NULL,
  description    TEXT                            NOT NULL,
- action         TEXT,
+ action         TEXT                            NOT NULL,
  created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
  seen           TIMESTAMP WITHOUT TIME ZONE,
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
+
+INSERT INTO public.notification_types(background_color, color, is_user_icon, description, icon) VALUES 
+('#1E1E1E', '#FFFFFF', TRUE, 'Follow'),
+('#1E1E1E', '#FFFFFF', TRUE, 'Same Here'),
+('#1E1E1E', '#FFFFFF', FALSE, 'Reward', 'reward'),
+('#1E1E1E', '#FFFFFF', FALSE, 'Post Approved', 'postApproved'),
+('#1E1E1E', '#FFFFFF', FALSE, 'Post Rejected', 'postRejected');
 
 INSERT INTO public.regions(name)                VALUES ('North America');
 INSERT INTO public.countries(name, region_id)   VALUES ('Canada', 1);
