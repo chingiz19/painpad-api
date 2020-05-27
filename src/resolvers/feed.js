@@ -1,5 +1,6 @@
 const Subscriptions = require('../models/Subscriptions');
 const Feed = require('../models/Feed');
+const User = require('../models/User');
 const Auth = require('../models/Auth');
 
 async function post(parent, { description, cityId, industryId }, { req }) {
@@ -55,7 +56,7 @@ async function sameHere(parent, { postId, add }, { req }) {
     if (!result) throw new Error('Error while implementing an action');
 
     if (sendNotification) {
-        const userResult = await DB.selectFromWhere('users', [`INITCAP(first_name) || ' ' || INITCAP(last_name) AS name`], userId);
+        const userResult = await User.getQuickInfo(userId);
 
         if (!userResult) throw new Error('Error while implementing an action');
 
@@ -63,11 +64,26 @@ async function sameHere(parent, { postId, add }, { req }) {
 
         if (!postUserResult) throw new Error('Error while implementing an action');
 
-        const userName = userResult[0].name;
+        const userName = userResult.name;
+        const userProfilePic = userResult.profilePic;
+        const userIndustry = userResult.industry;
         const postUserId = postUserResult[0].user_id;
 
+        User.incrementScore(postUserId);
+
         if (postUserId !== userId) {
-            Subscriptions.notify(postUserId, { description: `Yeah! ${userName} just agreed with your posting`, action: `/posts/${postId}` });
+
+            let notificationData = {
+                header: 'New Same-here',
+                subheader: userName,
+                description: `From <span className="span-reason">${userIndustry}</span> just agreed with your post`,
+                postId: postId,
+                action: `/posts/${postId}`,
+                icon: userProfilePic,
+                typeId: 2
+            }
+
+            Subscriptions.notify(postUserId, notificationData);
         }
     }
 
@@ -137,10 +153,8 @@ async function notifications(parent, { limit }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
-    const table = 'notifications';
-    const columns = ['id', 'action', 'icon', 'description', 'extract(epoch from created) * 1000 AS created', 'extract(epoch from seen) * 1000 AS seen']
 
-    const result = await DB.selectFromWhere(table, columns, [DB.whereObj('user_id', '=', userId)], { limit, rowCount: -1, orderBy: 'created DESC' });
+    const result = await Feed.getNotifications(userId);
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
 

@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
 cities, posts, approved_posts, topics, subtopics, follows, same_heres, reject_reasons,
-rejected_posts, notifications CASCADE;
+rejected_posts, notifications, notification_types CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -122,6 +122,7 @@ CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
  user_id        INTEGER                         NOT NULL    REFERENCES users(id),
  type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
+ post_id        INTEGER                         REFERENCES posts(id),
  header         TEXT                            NOT NULL,
  subheader      TEXT                            NOT NULL,
  description    TEXT                            NOT NULL,
@@ -131,12 +132,12 @@ CREATE TABLE notifications (
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
 
-INSERT INTO public.notification_types(background_color, color, is_user_icon, description, icon) VALUES 
-('#1E1E1E', '#FFFFFF', TRUE, 'Follow'),
-('#1E1E1E', '#FFFFFF', TRUE, 'Same Here'),
-('#1E1E1E', '#FFFFFF', FALSE, 'Reward', 'reward'),
-('#1E1E1E', '#FFFFFF', FALSE, 'Post Approved', 'postApproved'),
-('#1E1E1E', '#FFFFFF', FALSE, 'Post Rejected', 'postRejected');
+INSERT INTO public.notification_types(id, background_color, color, is_user_icon, description, icon) VALUES 
+(1, '#FFFFFF', '#1E1E1E', TRUE, 'Follow', ''),
+(2, '#FFFFFF', '#1E1E1E', TRUE, 'Same Here', ''),
+(3, '#FFFFFF', '#1E1E1E', FALSE, 'Reward', 'rewardNotification'),
+(4, '#FFFFFF', '#1E1E1E', FALSE, 'Post Approved', 'postApproved'),
+(5, '#FFFFFF', '#1E1E1E', FALSE, 'Post Rejected', 'postRejected');
 
 INSERT INTO public.regions(name)                VALUES ('North America');
 INSERT INTO public.countries(name, region_id)   VALUES ('Canada', 1);

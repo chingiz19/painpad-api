@@ -18,11 +18,13 @@ function subscribe(channel) {
  * @param {*} userId user ID
  * @param {*} data ->param  { description, action [optional] }
  */
-async function notify(userId, { description, action }) {
+async function notify(userId, { header, subheader, description, action, icon, typeId, postId }) {
     const channel = SUBCRIPTION_CHANNELS.NOTIFICATION_COUNT + userId;
     const table = 'notifications';
 
-    const result = await DB.insertValuesIntoTable(table, { user_id: userId, description, action });
+    console.log('Setting with post id', postId);
+
+    const result = await DB.insertValuesIntoTable(table, { user_id: userId, type_id: typeId, post_id: postId, header, subheader, description, action, icon });
 
     if (!result) return console.error('Error while inserting into DB notifications count');
 

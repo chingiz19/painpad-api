@@ -146,11 +146,24 @@ type Location {
 
 type Notification {
   id: ID!
+  header: String!
+  subheader: String!
   description: String!
   created: Float!
   icon: String!
+  action: String!
+  type: NotificationType!
+  postText: String
   seen: Float
-  action: String
+}
+
+type NotificationType {
+  id: ID!
+  backgroundColor: String!
+  color: String!
+  icon: String!
+  isUserIcon: Boolean!
+  description: String!
 }
 
 type AuthRes {

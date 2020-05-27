@@ -149,6 +149,30 @@ async function sameHereUsers(postId) {
     return result[0].users || [];
 }
 
+async function getNotifications(userId) {
+    let query = `
+    SELECT 
+        notifications.id, notifications.header, notifications.subheader, 
+        notifications.description, notifications.action, notifications.icon,
+        COALESCE(p.description, rp.description) AS "postText",
+        extract(epoch from notifications.created) * 1000 AS created, 
+        extract(epoch from notifications.seen) * 1000 AS seen,
+        json_build_object( 'id', nt.id,
+        'backgroundColor', nt.background_color,
+        'color', nt.color,
+        'icon', nt.icon,
+        'isUserIcon', nt.is_user_icon,
+        'description', nt.description ) AS type
+    FROM notifications
+    INNER JOIN notification_types AS nt ON nt.id = notifications.type_id
+    LEFT JOIN posts AS p ON p.id = notifications.post_id
+    LEFT JOIN rejected_posts AS rp ON rp.id = notifications.post_id
+    WHERE notifications.user_id = ${userId}
+    ORDER BY created DESC;`;
+
+    return await DB.incubate(query, [postId]);
+}
+
 async function getNewNotificationCount(userId) {
     let result = await DB.selectFromWhere('notifications', ['COUNT(id)'], [DB.whereObj('user_id', '=', userId), DB.whereObj('seen', 'IS', 'NULL', true)]);
 
@@ -157,4 +181,4 @@ async function getNewNotificationCount(userId) {
     return result[0].count || 0
 }
 
-module.exports = { getUserFeed, sameHereUsers, getPendingPosts, getNewNotificationCount }
+module.exports = { getUserFeed, sameHereUsers, getPendingPosts, getNewNotificationCount, getNotifications }

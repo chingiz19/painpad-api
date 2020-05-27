@@ -1,7 +1,6 @@
 const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const User = require('../models/User');
-const Feed = require('../models/Feed');
 
 const TABLE = 'users';
 const GENERIC_ERRROR = 'Unexpexted error occured while request';
@@ -109,13 +108,24 @@ async function follow(parent, { userIdToFollow }, { req }) {
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
-    const userResult = await DB.selectFromWhere('users', [`INITCAP(first_name) || ' ' || INITCAP(last_name) AS name`], userId);
+    const userResult = await User.getQuickInfo(userId);
 
     if (!userResult) throw new Error('Error while implementing an action');
 
-    const userName = userResult[0].name;
+    const userName = userResult.name;
+    const userProfilePic = userResult.profilePic;
+    const userIndustry = userResult.industry;
 
-    Subscriptions.notify(userIdToFollow, { description: `${userName} started following you`, action: `/users/${userId}` });
+    let notificationData = {
+        header: 'New Follower',
+        subheader: userName,
+        description: `From <span className="span-reason">${userIndustry}</span> started following you`,
+        action: `/users/${userId}`,
+        icon: userProfilePic,
+        typeId: 1
+    }
+
+    Subscriptions.notify(userIdToFollow, notificationData);
 
     return true
 }

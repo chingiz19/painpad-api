@@ -53,6 +53,23 @@ async function getUserStats(userId, whereColumn, column) {
     return result[0].json_agg || [];
 }
 
+async function getQuickInfo(userId) {
+    let query = `
+    SELECT 
+	json_build_object('name', INITCAP(users.first_name) || ' ' || INITCAP(users.last_name),
+                            'profilePic', users.profile_pic,
+                            'industry', INITCAP(industries.name)) AS user
+    FROM users
+    INNER JOIN industries ON industry_id = industries.id
+    WHERE users.id = ${userId};`;
+
+    let result = await DB.incubate(query);
+
+    if (!result) return false;
+
+    return result[0].user;
+}
+
 async function changeUserProfile(userId, args) {
     let updates = {};
 
@@ -102,9 +119,17 @@ async function incrementScore(userId, incrementBy = 1) {
         return false;
     }
 
-    Subscriptions.notify(userId, { description: `Your score has been promoted from ${currentScore} to ${updatedScore}`, action: `/users/${userId}` });
+    let notificationData = {
+        header: 'Score Boost',
+        subheader: `${incrementBy} new points`,
+        description: `Your score has been promoted from ${currentScore} to ${updatedScore} for <span className="span-reason">engagement</span>`,
+        action: `/users/${userId}`,
+        typeId: 3
+    }
+
+    Subscriptions.notify(userId, notificationData);
 
     return result;
 }
 
-module.exports = { getUserInformation, getUserStats, changeUserProfile, incrementScore }
+module.exports = { getUserInformation, getUserStats, getQuickInfo, changeUserProfile, incrementScore }

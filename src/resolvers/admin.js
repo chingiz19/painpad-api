@@ -72,7 +72,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     if (!currentUser) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    let postUserTotalScore = 1;
+    let currentUserTotalScore = 1;
     const currentUserId = currentUser.id;
     const currentOccupationId = currentUser.occupation;
     const currentIndustryId = currentUser.industry;
@@ -85,6 +85,8 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
     if (!subTopicPosts) throw new Error(APPROVE_ERROR_MESSAGE);
 
     for (const post of subTopicPosts) {
+        let postUserScore = 0;
+
         const postUserId = post.user.id;
 
         const postUserOccupationId = post.user.occupationId;
@@ -95,34 +97,32 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
         const postCountryId = post.countryId;
 
         if (currentOccupationId && postUserOccupationId && currentOccupationId === postUserOccupationId) {
-            postUserTotalScore += MATCH_SCORES.OCCUPATION;
-            User.incrementScore(postUserId, MATCH_SCORES.OCCUPATION);
+            postUserScore += MATCH_SCORES.OCCUPATION;
         }
 
         if (currentIndustryId === postUserIndustryId) {
-            postUserTotalScore += MATCH_SCORES.USER_INDUSTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.USER_INDUSTRY);
+            postUserScore += MATCH_SCORES.USER_INDUSTRY;
         }
 
         if (currentIndustryId === postIndustryId) {
-            postUserTotalScore += MATCH_SCORES.POST_INDUSTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.POST_INDUSTRY);
+            postUserScore += MATCH_SCORES.POST_INDUSTRY;
         }
 
         if (currentCityId === postCityId) {
-            postUserTotalScore += MATCH_SCORES.CITY;
-            User.incrementScore(postUserId, MATCH_SCORES.CITY);
+            postUserScore += MATCH_SCORES.CITY;
         }
 
         if (currentStateId === postStateId) {
-            postUserTotalScore += MATCH_SCORES.STATE;
-            User.incrementScore(postUserId, MATCH_SCORES.STATE);
+            postUserScore += MATCH_SCORES.STATE;
         }
 
         if (currentCountryId === postCountryId) {
-            postUserTotalScore += MATCH_SCORES.COUNTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.COUNTRY);
+            postUserScore += MATCH_SCORES.COUNTRY;
         }
+
+        currentUserTotalScore += postUserScore;
+
+        User.incrementScore(postUserId, postUserScore);
     }
 
     //if other posts exist
@@ -138,9 +138,18 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     if (!result) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    User.incrementScore(currentUserId, postUserTotalScore);
+    User.incrementScore(currentUserId, currentUserTotalScore);
 
-    Subscriptions.notify(currentUserId, { description: `Congrats! Your post has been has been approved by moderators`, action: `/posts/${postId}` });
+    let notificationData = {
+        header: 'Post Approved',
+        subheader: 'Congrats!',
+        description: `Your post has been has been approved by moderators`,
+        postId: postId,
+        action: `/posts/${postId}`,
+        typeId: 4
+    }
+
+    Subscriptions.notify(currentUserId, notificationData);
 
     Subscriptions.newPost(postId);
 
@@ -207,7 +216,16 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
     const rejectReason = selectReason[0].description;
     const rejectedPostId = insertPost[0].id;
 
-    Subscriptions.notify(userId, { description: `Your post has been has been rejected. Reason: ${rejectReason}`, action: `/posts/${rejectedPostId}?rejected=true` });
+    let notificationData = {
+        header: 'Post Rejected',
+        subheader: 'Ooh no...',
+        description: `Your post has been has been rejected due to <span className="span-reason">${rejectReason}</span>`,
+        postId: rejectedPostId,
+        action: `/posts/${rejectedPostId}?rejected=true`,
+        typeId: 5
+    }
+
+    Subscriptions.notify(userId, notificationData);
 
     //TODO: send email notification to user
 
