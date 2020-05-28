@@ -191,12 +191,13 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
 
     if (selectApproved) throw new Error('Approved posts can not be rejected');
 
-    let selectPost = await DB.selectFromWhere('posts', ['description', 'city_id', 'industry_id', 'created'], postId);
+    let selectPost = await DB.selectFromWhere('posts', ['description', 'city_id', 'industry_id', 'user_id', 'created'], postId);
 
     if (!selectPost) throw new Error('Post does not exist');
 
     let insertObj = {
         rejected_by: req.session.user.id,
+        posted_by: selectPost[0].user_id,
         description: selectPost[0].description,
         city_id: selectPost[0].city_id,
         industry_id: selectPost[0].industry_id,
@@ -214,7 +215,7 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
     if (!deletePost) throw new Error('Error while deleting post from table');
 
     const rejectReason = selectReason[0].description;
-    const rejectedPostId = insertPost[0].id;
+    const rejectedPostId = insertPost.id;
 
     let notificationData = {
         header: 'Post Rejected',
@@ -225,7 +226,7 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
         typeId: 5
     }
 
-    Subscriptions.notify(userId, notificationData);
+    Subscriptions.notify(selectPost[0].user_id, notificationData);
 
     //TODO: send email notification to user
 

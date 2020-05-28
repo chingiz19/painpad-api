@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
 cities, posts, approved_posts, topics, subtopics, follows, same_heres, reject_reasons,
-rejected_posts, notifications, notification_types CASCADE;
+rejected_posts, notification_types, notifications CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -89,6 +89,7 @@ CREATE TABLE rejected_posts (
  description    TEXT                            NOT NULL    UNIQUE,
  city_id        INTEGER                         NOT NULL    REFERENCES cities(id),
  industry_id    INTEGER                         NOT NULL    REFERENCES industries(id),
+ posted_by      INTEGER                         NOT NULL    REFERENCES users(id),
  created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
  rejected       TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
  rejected_by    INTEGER                         NOT NULL    REFERENCES users(id),
@@ -112,7 +113,6 @@ CREATE TABLE follows (
 CREATE TABLE notification_types (
  id                 SERIAL      PRIMARY KEY,
  background_color   TEXT        NOT NULL,
- color              TEXT        NOT NULL,
  is_user_icon       BOOLEAN     NOT NULL    DEFAULT FALSE,
  description        TEXT        NOT NULL,
  icon               TEXT
@@ -122,7 +122,7 @@ CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
  user_id        INTEGER                         NOT NULL    REFERENCES users(id),
  type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
- post_id        INTEGER                         REFERENCES posts(id),
+ post_id        INTEGER,
  header         TEXT                            NOT NULL,
  subheader      TEXT                            NOT NULL,
  description    TEXT                            NOT NULL,
@@ -132,12 +132,12 @@ CREATE TABLE notifications (
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
 
-INSERT INTO public.notification_types(id, background_color, color, is_user_icon, description, icon) VALUES 
-(1, '#FFFFFF', '#1E1E1E', TRUE, 'Follow', ''),
-(2, '#FFFFFF', '#1E1E1E', TRUE, 'Same Here', ''),
-(3, '#FFFFFF', '#1E1E1E', FALSE, 'Reward', 'rewardNotification'),
-(4, '#FFFFFF', '#1E1E1E', FALSE, 'Post Approved', 'postApproved'),
-(5, '#FFFFFF', '#1E1E1E', FALSE, 'Post Rejected', 'postRejected');
+INSERT INTO public.notification_types(id, background_color, is_user_icon, description, icon) VALUES 
+(1, '#3fa5f8', TRUE, 'Follow', ''),
+(2, '#3fa5f8', TRUE, 'Same Here', ''),
+(3, '#f4e94b', FALSE, 'Reward', 'notifReward'),
+(4, '#c6f1e7', FALSE, 'Post Approved', 'postApproved'),
+(5, '#ffcbcb', FALSE, 'Post Rejected', 'postRejected');
 
 INSERT INTO public.regions(name)                VALUES ('North America');
 INSERT INTO public.countries(name, region_id)   VALUES ('Canada', 1);

@@ -159,7 +159,6 @@ async function getNotifications(userId) {
         extract(epoch from notifications.seen) * 1000 AS seen,
         json_build_object( 'id', nt.id,
         'backgroundColor', nt.background_color,
-        'color', nt.color,
         'icon', nt.icon,
         'isUserIcon', nt.is_user_icon,
         'description', nt.description ) AS type
@@ -170,7 +169,62 @@ async function getNotifications(userId) {
     WHERE notifications.user_id = ${userId}
     ORDER BY created DESC;`;
 
-    return await DB.incubate(query, [postId]);
+    return await DB.incubate(query);
+}
+
+async function getUserRejectedPost(userId, rejectedPostId) {
+    let query = `
+    SELECT 
+        json_build_object(
+            'id', rejected_posts.id,
+            'description', rejected_posts.description,
+            'created', extract(epoch from rejected_posts.created) * 1000,
+            'industry', INITCAP(industries.name),
+            'location', cities.name || ', ' || countries.short_name,
+            'postedBy', post_users.obj,
+            'rejected', extract(epoch from rejected_posts.rejected) * 1000,
+            'reason', reject_reasons.description,
+            'explanation', rejected_posts.explanation,
+            'suggestion', rejected_posts.suggestion,
+            'rejectedBy', moderators.obj ) AS post
+    FROM rejected_posts
+    INNER JOIN industries ON rejected_posts.industry_id = industries.id
+    INNER JOIN cities ON rejected_posts.city_id = cities.id
+    INNER JOIN states ON states.id = cities.state_id
+    INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN reject_reasons ON reject_reasons.id = rejected_posts.reason_id
+    INNER JOIN 
+    (SELECT
+        users.id,
+        json_build_object('id', users.id,
+                        'firstName', INITCAP(users.first_name),
+                        'lastName', INITCAP(users.last_name),
+                        'profilePic', users.profile_pic,
+                        'industry', INITCAP(industries.name),
+                        'occupation', INITCAP(occupations.name)) AS obj
+    FROM users
+    LEFT JOIN occupations ON users.occupation_id = occupations.id
+    INNER JOIN industries ON industry_id = industries.id
+    WHERE users.id = ${userId}) AS post_users ON post_users.id = rejected_posts.posted_by
+    INNER JOIN 
+    (SELECT
+        users.id,
+        json_build_object('id', users.id,
+                        'firstName', INITCAP(users.first_name),
+                        'lastName', INITCAP(users.last_name),
+                        'profilePic', users.profile_pic,
+                        'industry', INITCAP(industries.name),
+                        'occupation', INITCAP(occupations.name)) AS obj
+    FROM users
+    LEFT JOIN occupations ON users.occupation_id = occupations.id
+    INNER JOIN industries ON industry_id = industries.id) AS moderators ON moderators.id = rejected_posts.rejected_by
+    WHERE rejected_posts.id = $1;`;
+
+    const result = await DB.incubate(query, [rejectedPostId]);
+
+    if (!result) return false;
+
+    return result[0].post || {};
 }
 
 async function getNewNotificationCount(userId) {
@@ -181,4 +235,4 @@ async function getNewNotificationCount(userId) {
     return result[0].count || 0
 }
 
-module.exports = { getUserFeed, sameHereUsers, getPendingPosts, getNewNotificationCount, getNotifications }
+module.exports = { getUserFeed, sameHereUsers, getPendingPosts, getNewNotificationCount, getNotifications, getUserRejectedPost }

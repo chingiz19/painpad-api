@@ -8,6 +8,7 @@ type Query {
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
   posts(userId: ID, topicId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
+  rejectedPost(rejectedPostId: ID!): RejectedPost!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
   userPendingPosts: [PendingPost]!
@@ -121,6 +122,20 @@ type Post {
   sameHered: Boolean!
 }
 
+type RejectedPost {
+  id: ID!
+  description: String!
+  postedBy: ShortUser!
+  created: Float!
+  industry: String!
+  location: String!
+  rejected: Float!
+  rejectedBy: ShortUser!
+  reason: String!
+  explanation: String
+  suggestion: String
+}
+
 type PendingPost {
   id: ID!
   description: String!
@@ -160,7 +175,6 @@ type Notification {
 type NotificationType {
   id: ID!
   backgroundColor: String!
-  color: String!
   icon: String!
   isUserIcon: Boolean!
   description: String!

@@ -32,6 +32,18 @@ async function posts(parent, { userId, topicId, postId, lastDate, count }, { req
     return result;
 }
 
+async function getRejectedPost(parent, { rejectedPostId }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    let userId = req.session.user && req.session.user.id;
+
+    let result = await Feed.getUserRejectedPost(userId, rejectedPostId);
+
+    if (!result) throw new Error('Error while getting rejected post');
+
+    return result;
+}
+
 async function sameHere(parent, { postId, add }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
@@ -158,11 +170,11 @@ async function notifications(parent, { limit }, { req }) {
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
 
-    const update = await DB.updateValuesInTable(table, [DB.whereObj('seen', 'IS', 'NULL', true)], { seen: 'now()' }, { rowCount: -1 });
+    const update = await DB.updateValuesInTable('notifications', [DB.whereObj('seen', 'IS', 'NULL', true)], { seen: 'now()' }, { rowCount: -1 });
 
     if (!update) throw new Error('Unexpected error while getting notifications from DB');
 
     return result;
 }
 
-module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost, notifications, newNotificationCount }
+module.exports = { post, posts, pendingPosts, sameHereUsers, sameHere, removePost, notifications, newNotificationCount, getRejectedPost }

@@ -18,6 +18,7 @@ module.exports = {
   signout: User.signout,
   signS3: AWS.signS3,
   posts: Feed.posts,
+  rejectedPost: Feed.getRejectedPost,
   userPendingPosts: Feed.pendingPosts,
   sameHereUsers: Feed.sameHereUsers,
   adminPendingPosts: Admin.pedningPosts,

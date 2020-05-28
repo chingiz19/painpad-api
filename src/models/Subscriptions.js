@@ -22,8 +22,6 @@ async function notify(userId, { header, subheader, description, action, icon, ty
     const channel = SUBCRIPTION_CHANNELS.NOTIFICATION_COUNT + userId;
     const table = 'notifications';
 
-    console.log('Setting with post id', postId);
-
     const result = await DB.insertValuesIntoTable(table, { user_id: userId, type_id: typeId, post_id: postId, header, subheader, description, action, icon });
 
     if (!result) return console.error('Error while inserting into DB notifications count');
