@@ -220,7 +220,7 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
     let notificationData = {
         header: 'Post Rejected',
         subheader: 'Ooh no...',
-        description: `Your post has been has been rejected due to <span className="span-reason">${rejectReason}</span>`,
+        description: `Your post has been has been rejected due to <span>${rejectReason}<span>`,
         postId: rejectedPostId,
         action: `/posts/${rejectedPostId}?rejected=true`,
         typeId: 5

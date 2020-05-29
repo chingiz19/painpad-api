@@ -121,8 +121,8 @@ async function incrementScore(userId, incrementBy = 1) {
 
     let notificationData = {
         header: 'Score Boost',
-        subheader: `${incrementBy} new points`,
-        description: `Your score has been promoted from ${currentScore} to ${updatedScore} for <span className="span-reason">engagement</span>`,
+        subheader: `${incrementBy} new point${incrementBy === 1 ? 's' : ''}!`,
+        description: `Your score has been promoted from <span> ${currentScore} to ${updatedScore}<span> for engagement`,
         action: `/users/${userId}`,
         typeId: 3
     }

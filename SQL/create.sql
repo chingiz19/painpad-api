@@ -133,9 +133,9 @@ CREATE TABLE notifications (
 );
 
 INSERT INTO public.notification_types(id, background_color, is_user_icon, description, icon) VALUES 
-(1, '#3fa5f8', TRUE, 'Follow', ''),
-(2, '#3fa5f8', TRUE, 'Same Here', ''),
-(3, '#f4e94b', FALSE, 'Reward', 'notifReward'),
+(1, '#3FA5F899', TRUE, 'Follow', ''),
+(2, '#3FA5F899', TRUE, 'Same Here', ''),
+(3, '#F4E94B99', FALSE, 'Reward', 'notifReward'),
 (4, '#c6f1e7', FALSE, 'Post Approved', 'postApproved'),
 (5, '#ffcbcb', FALSE, 'Post Rejected', 'postRejected');
 

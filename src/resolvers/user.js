@@ -119,7 +119,7 @@ async function follow(parent, { userIdToFollow }, { req }) {
     let notificationData = {
         header: 'New Follower',
         subheader: userName,
-        description: `From <span className="span-reason">${userIndustry}</span> started following you`,
+        description: `From <span>${userIndustry}<span> started following you`,
         action: `/users/${userId}`,
         icon: userProfilePic,
         typeId: 1
