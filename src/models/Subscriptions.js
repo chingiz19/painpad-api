@@ -1,5 +1,6 @@
 const { PubSub } = require("graphql-subscriptions");
 const Feed = require('../models/Feed');
+const Email = require('../models/Email');
 const pubsub = new PubSub();
 
 const NOTIFICATION_COUNT_USER_REMINDER = 10;
@@ -32,8 +33,15 @@ async function notify(userId, { header, subheader, description, action, icon, ty
 
     if (!newCount) return console.error('Error while inserting into DB notifications count');
 
-    if (newCount % NOTIFICATION_COUNT_USER_REMINDER) {
-        //TODO: send email about accumulated notifications
+    if (newCount % NOTIFICATION_COUNT_USER_REMINDER === 0) {
+        let selectUserInfo = await DB.selectFromWhere('users', ['email', 'INITCAP(first_name) AS "firstName"'], userId);
+
+        if (!selectUserInfo) throw new Error('Error while retrieving user info for email notification');
+    
+        const firstName = selectUserInfo[0].firstName;
+        const email = selectUserInfo[0].email;
+    
+        Email.countReminderNotification(email, firstName, newCount);
     }
 
     return pubsub.publish(channel, { newNotificationCount: newCount });
