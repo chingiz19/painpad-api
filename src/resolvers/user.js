@@ -1,6 +1,7 @@
 const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const User = require('../models/User');
+const Email = require('../models/Email');
 
 const TABLE = 'users';
 const GENERIC_ERRROR = 'Unexpexted error occured while request';
@@ -180,7 +181,7 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
 
     let userId = payload.userId;
 
-    let selectResult = await DB.selectFromWhere(TABLE, ['*'], userId);
+    let selectResult = await DB.selectFromWhere(TABLE, ['INITCAP(first_name) AS "firstName", *'], userId);
 
     if (!selectResult) throw new Error('User is not found');
 
@@ -196,7 +197,7 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
-    //TODO: send email that user's password has been changed
+    Email.afterResetPasswordNotification(user.email, user.firstName);
 
     return true;
 }

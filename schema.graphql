@@ -60,7 +60,7 @@ type Mutation {
 
 type Subscription {
   newPost: Post!
-  newNotificationCount: Int!
+  newNotificationCount: Int
 }
 
 type Topic {

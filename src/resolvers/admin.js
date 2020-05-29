@@ -3,6 +3,7 @@ const Auth = require('../models/Auth');
 const Admin = require('../models/Admin');
 const User = require('../models/User');
 const Feed = require('../models/Feed');
+const Email = require('../models/Email');
 
 const MATCH_SCORES = {
     OCCUPATION: 10,
@@ -195,9 +196,11 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
 
     if (!selectPost) throw new Error('Post does not exist');
 
+    const postUserId = selectPost[0].user_id;
+
     let insertObj = {
         rejected_by: req.session.user.id,
-        posted_by: selectPost[0].user_id,
+        posted_by: postUserId,
         description: selectPost[0].description,
         city_id: selectPost[0].city_id,
         industry_id: selectPost[0].industry_id,
@@ -228,7 +231,15 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
 
     Subscriptions.notify(selectPost[0].user_id, notificationData);
 
-    //TODO: send email notification to user
+    let selectUserInfo = await DB.selectFromWhere('users', ['email', 'INITCAP(first_name) AS "firstName"'], postUserId);
+
+    if (!selectUserInfo) throw new Error('Error while retrieving user info for email notification');
+
+    const actionUrl = `https://painpad.co/posts/${rejectedPostId}?rejected=true`;
+    const firstName = selectUserInfo[0].firstName;
+    const email = selectUserInfo[0].email;
+
+    Email.afterResetPasswordNotification(email, firstName, actionUrl, rejectReason, { suggestion, explanation });
 
     return true;
 }

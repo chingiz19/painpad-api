@@ -2,6 +2,8 @@ const { PubSub } = require("graphql-subscriptions");
 const Feed = require('../models/Feed');
 const pubsub = new PubSub();
 
+const NOTIFICATION_COUNT_USER_REMINDER = 10;
+
 const SUBCRIPTION_CHANNELS = {
     NOTIFICATION_COUNT: 'HVl3SHgqqH',
     NEW_POST: 'TCCCqmg6Rg'
@@ -24,9 +26,15 @@ async function notify(userId, { header, subheader, description, action, icon, ty
 
     const result = await DB.insertValuesIntoTable(table, { user_id: userId, type_id: typeId, post_id: postId, header, subheader, description, action, icon });
 
-    if (!result) return console.error('Error while inserting into DB notifications count');
+    if (!result) return console.error('Error while inserting into DB notifications @ Subscriptions.notify()');
 
     const newCount = await Feed.getNewNotificationCount(userId);
+
+    if (!newCount) return console.error('Error while inserting into DB notifications count');
+
+    if (newCount % NOTIFICATION_COUNT_USER_REMINDER) {
+        //TODO: send email about accumulated notifications
+    }
 
     return pubsub.publish(channel, { newNotificationCount: newCount });
 }
