@@ -120,6 +120,7 @@ CREATE TABLE notification_types (
 
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
+ initiator_id   INTEGER                         NOT NULL    REFERENCES users(id),
  user_id        INTEGER                         NOT NULL    REFERENCES users(id),
  type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
  post_id        INTEGER,

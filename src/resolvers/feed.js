@@ -50,24 +50,11 @@ async function sameHere(parent, { postId, add }, { req }) {
     const tableName = 'same_heres';
 
     let result;
-    let sendNotification = false;
     let userId = req.session.user.id;
 
     if (add) {
         result = await DB.insertValuesIntoTable(tableName, { user_id: userId, post_id: postId });
-        sendNotification = true;
-    } else {
-        let where = [];
 
-        where.push(DB.whereObj('user_id', '=', userId));
-        where.push(DB.whereObj('post_id', '=', postId));
-
-        result = await DB.deleteFromWhere(tableName, where);
-    }
-
-    if (!result) throw new Error('Error while implementing an action');
-
-    if (sendNotification) {
         const userResult = await User.getQuickInfo(userId);
 
         if (!userResult) throw new Error('Error while implementing an action');
@@ -81,9 +68,10 @@ async function sameHere(parent, { postId, add }, { req }) {
         const userIndustry = userResult.industry;
         const postUserId = postUserResult[0].user_id;
 
-        User.incrementScore(postUserId);
-
         if (postUserId !== userId) {
+            User.incrementScore(postUserId);
+
+            //TODO: check for initioator
 
             let notificationData = {
                 header: 'New Same-here',
@@ -97,7 +85,16 @@ async function sameHere(parent, { postId, add }, { req }) {
 
             Subscriptions.notify(postUserId, notificationData);
         }
+    } else {
+        let where = [];
+
+        where.push(DB.whereObj('user_id', '=', userId));
+        where.push(DB.whereObj('post_id', '=', postId));
+
+        result = await DB.deleteFromWhere(tableName, where);
     }
+
+    if (!result) throw new Error('Error while implementing an action');
 
     return true;
 }

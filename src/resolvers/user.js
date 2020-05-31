@@ -117,6 +117,8 @@ async function follow(parent, { userIdToFollow }, { req }) {
     const userProfilePic = userResult.profilePic;
     const userIndustry = userResult.industry;
 
+    //TODO: check for initiator
+
     let notificationData = {
         header: 'New Follower',
         subheader: userName,
@@ -190,7 +192,7 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
     let newCompareResult = await Auth.comparePasswords(newPwd, user.password_hash);
 
     if (newCompareResult) throw new Error('New passwrod can not be same as old');
-    
+
     let updateData = { password_hash: await Auth.generatePassHash(newPwd) }
 
     let result = await DB.updateValuesInTable(TABLE, userId, updateData);
