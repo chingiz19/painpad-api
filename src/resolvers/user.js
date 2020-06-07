@@ -117,7 +117,7 @@ async function follow(parent, { userIdToFollow }, { req }) {
     const userProfilePic = userResult.profilePic;
     const userIndustry = userResult.industry;
 
-    //TODO: check for initiator
+    //TODO: check for recent activity
 
     let notificationData = {
         header: 'New Follower',

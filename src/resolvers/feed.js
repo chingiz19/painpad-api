@@ -25,7 +25,7 @@ async function post(parent, { description, cityId, industryId }, { req }) {
 async function posts(parent, { userId, topicId, postId, lastDate, count }, { req }) {
     let firstPersonId = (req.session.user && req.session.user.id) || 0;
 
-    let result = await Feed.getUserFeed(firstPersonId, { userId, topicId, postId }, count, lastDate);
+    let result = await Feed.getUserFeed(firstPersonId, { userId, topicId, postId, lastDate, count});
 
     if (!result) throw new Error('Error while getting news feed');
 
@@ -71,7 +71,7 @@ async function sameHere(parent, { postId, add }, { req }) {
         if (postUserId !== userId) {
             User.incrementScore(postUserId);
 
-            //TODO: check for initioator
+            //TODO: check for recent activity
 
             let notificationData = {
                 header: 'New Same-here',

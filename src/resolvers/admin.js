@@ -132,7 +132,9 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
         if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
 
-        for (const { userId } of topicUsers) User.incrementScore(userId);
+        for (const { id } of topicUsers) {
+            User.incrementScore(id);
+        }
     }
 
     let result = await DB.insertValuesIntoTable('approved_posts', { post_id: postId, subtopic_id: subTopicId });

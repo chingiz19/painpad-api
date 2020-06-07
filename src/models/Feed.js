@@ -1,11 +1,11 @@
-async function getUserFeed(firstPersonId, { userId, topicId, postId }, count = 20, lastDate) {
+async function getUserFeed(firstPersonId, { userId, topicId, postId, lastDate, count = 20}) {
     let whereStr = '';
     let whereArr = [];
     let counter = 1;
     let params = [];
 
     if (lastDate) {
-        whereArr.push(`WHERE (extract(epoch from COALESCE(ap.approved, posts.created)) * 1000)  > $${counter}`);
+        whereArr.push(`(extract(epoch from posts.created) * 1000)  < $${counter}`);
         params.push(lastDate);
         counter++;
     }
@@ -32,19 +32,16 @@ async function getUserFeed(firstPersonId, { userId, topicId, postId }, count = 2
 
     let query = `
     SELECT 
-        json_agg(json_build_object(
-            'id', posts.id,
-            'description', posts.description,
-            'created', extract(epoch from posts.created) * 1000,
-            'industry', INITCAP(industries.name),
-            'approved', extract(epoch from ap.approved) * 1000,
-            'subTopic', json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)),
-            'location',  json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
-                                            'countryId', countries.id, 'countryName', countries.short_name),
-            'sameHere', COALESCE(sh.count, 0),
-            'sameHered', COALESCE(sh.same_hered, FALSE),
-            'postedBy', users.obj
-        ) ORDER BY posts.created DESC) AS posts
+        posts.id, posts.description,
+        extract(epoch from posts.created) * 1000 AS created,
+        INITCAP(industries.name) AS industry,
+        extract(epoch from ap.approved) * 1000 AS approved,
+        json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)) AS "subTopic",
+        json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
+                                    'countryId', countries.id, 'countryName', countries.short_name) AS location,
+        COALESCE(sh.count, 0) AS "sameHere",
+        COALESCE(sh.same_hered, FALSE) AS "sameHered",
+        users.obj AS "postedBy" 
     FROM posts
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = subtopic_id
@@ -67,13 +64,16 @@ async function getUserFeed(firstPersonId, { userId, topicId, postId }, count = 2
     LEFT JOIN occupations ON users.occupation_id = occupations.id
     INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
     ${whereStr}
-    LIMIT ${count};`;
+    ORDER BY posts.created DESC
+    LIMIT $${counter};`;
+
+    params.push(count);
 
     let result = await DB.incubate(query, params);
 
     if (!result) return false;
 
-    return result[0].posts || [];
+    return result || [];
 }
 
 async function getPendingPosts(userId) {

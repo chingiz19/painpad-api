@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
 cities, posts, approved_posts, topics, subtopics, follows, same_heres, reject_reasons,
-rejected_posts, notification_types, notifications CASCADE;
+rejected_posts, notification_types, notifications, activity_types, user_activities CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -120,7 +120,6 @@ CREATE TABLE notification_types (
 
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
- initiator_id   INTEGER                         NOT NULL    REFERENCES users(id),
  user_id        INTEGER                         NOT NULL    REFERENCES users(id),
  type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
  post_id        INTEGER,
@@ -133,7 +132,28 @@ CREATE TABLE notifications (
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
 
-INSERT INTO public.notification_types(id, background_color, is_user_icon, description, icon) VALUES 
+CREATE TABLE activity_types (
+ id                 SERIAL      PRIMARY KEY,
+ description        TEXT        NOT NULL
+);
+
+CREATE TABLE user_activities (
+ id             SERIAL                          PRIMARY KEY,
+ user_id        INTEGER                         NOT NULL    REFERENCES users(id),
+ type_id        INTEGER                         NOT NULL    REFERENCES activity_types(id),
+ post_id        INTEGER,
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO activity_types(id, description) VALUES 
+(1, 'Follow'),
+(2, 'Unfollow'),
+(3, 'Same Here'),
+(4, 'Un Same Here'),
+(5, 'New Post');
+(6, 'Remove Post');
+
+INSERT INTO notification_types(id, background_color, is_user_icon, description, icon) VALUES 
 (1, '#3FA5F899', TRUE, 'Follow', ''),
 (2, '#3FA5F899', TRUE, 'Same Here', ''),
 (3, '#F4E94B99', FALSE, 'Reward', 'notifReward'),
