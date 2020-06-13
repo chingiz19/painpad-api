@@ -82,10 +82,10 @@ let options = {
   cors: {
     credentials: true,
     origin: [
-      // "http://localhost:8080",
-      // "http://localhost:3000",
-      // "http://api.painpad.co"
-      "*"
+      "http://localhost:8080",
+      "http://localhost:3000",
+      "http://api.painpad.co",
+      "http://192.168.1.67:3000"
     ]
   }
 };
