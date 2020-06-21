@@ -1,24 +1,21 @@
-let { PubSub } = require("graphql-subscriptions");
-
-const pubsub = new PubSub();
+const Auth = require('../models/Auth');
+const Subscriptions = require('../models/Subscriptions');
 
 module.exports = {
-  newPost: {
+  newNotificationCount: {
     subscribe: (parent, args, { req }) => {
-      if (typeof req.session.user === "undefined") {
-        throw new Auth.AuthenticationError();
-      }
+      if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
-      return pubsub.asyncIterator("SOMETHING_CHANGED_TOPIC"); //TODO: edit this
+      const userId = req.session.user.id;
+
+      return Subscriptions.subscribe(Subscriptions.SUBCRIPTION_CHANNELS.NOTIFICATION_COUNT + userId);
     }
   },
-  notification: {
+  newPost: {
     subscribe: (parent, args, { req }) => {
-      if (typeof req.session.user === "undefined") {
-        throw new Auth.AuthenticationError();
-      }
+      if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
-      return pubsub.asyncIterator("SOMETHING_CHANGED_TOPIC"); //TODO: edit this
+      return Subscriptions.subscribe(Subscriptions.SUBCRIPTION_CHANNELS.NEW_POST);
     }
   }
 };

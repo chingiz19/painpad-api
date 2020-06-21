@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS occupations, industries, users, regions, countries, states, 
 cities, posts, approved_posts, topics, subtopics, follows, same_heres, reject_reasons,
-rejected_posts, notifications CASCADE;
+rejected_posts, notification_types, notifications, activity_types, user_activities CASCADE;
 
 CREATE TABLE occupations (
  id             SERIAL      PRIMARY KEY,
@@ -20,6 +20,7 @@ CREATE TABLE regions (
 CREATE TABLE countries (
  id             SERIAL      PRIMARY KEY,
  name           TEXT        NOT NULL,
+ short_name     TEXT        NOT NULL,
  region_id      INTEGER     REFERENCES regions(id)
 );
 
@@ -58,7 +59,7 @@ CREATE TABLE topics (
 
 CREATE TABLE subtopics (
  id         SERIAL      PRIMARY KEY,
- name       TEXT        NOT NULL    UNIQUE,
+ name       TEXT        NOT NULL,
  topic_id   INTEGER     REFERENCES topics(id)
 );
 
@@ -88,10 +89,11 @@ CREATE TABLE rejected_posts (
  description    TEXT                            NOT NULL    UNIQUE,
  city_id        INTEGER                         NOT NULL    REFERENCES cities(id),
  industry_id    INTEGER                         NOT NULL    REFERENCES industries(id),
+ posted_by      INTEGER                         NOT NULL    REFERENCES users(id),
  created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
  rejected       TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
  rejected_by    INTEGER                         NOT NULL    REFERENCES users(id),
- reson_id       INTEGER                         NOT NULL    REFERENCES reject_reasons(id),
+ reason_id      INTEGER                         NOT NULL    REFERENCES reject_reasons(id),
  explanation    TEXT,
  suggestion     TEXT
 );
@@ -108,13 +110,55 @@ CREATE TABLE follows (
  follows    INTEGER     REFERENCES users(id)
 );
 
+CREATE TABLE notification_types (
+ id                 SERIAL      PRIMARY KEY,
+ background_color   TEXT        NOT NULL,
+ is_user_icon       BOOLEAN     NOT NULL    DEFAULT FALSE,
+ description        TEXT        NOT NULL,
+ icon               TEXT
+);
+
 CREATE TABLE notifications (
  id             SERIAL                          PRIMARY KEY,
- description    TEXT                            NOT NULL    UNIQUE,
- user_id        INTEGER                         REFERENCES users(id),
- created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
+ user_id        INTEGER                         NOT NULL    REFERENCES users(id),
+ type_id        INTEGER                         NOT NULL    REFERENCES notification_types(id),
+ post_id        INTEGER,
+ header         TEXT                            NOT NULL,
+ subheader      TEXT                            NOT NULL,
+ description    TEXT                            NOT NULL,
+ action         TEXT                            NOT NULL,
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+ seen           TIMESTAMP WITHOUT TIME ZONE,
  icon           TEXT                            NOT NULL    DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Infobox_info_icon.svg'
 );
+
+CREATE TABLE activity_types (
+ id                 SERIAL      PRIMARY KEY,
+ description        TEXT        NOT NULL
+);
+
+CREATE TABLE user_activities (
+ id             SERIAL                          PRIMARY KEY,
+ user_id        INTEGER                         NOT NULL    REFERENCES users(id),
+ type_id        INTEGER                         NOT NULL    REFERENCES activity_types(id),
+ post_id        INTEGER,
+ created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO activity_types(id, description) VALUES 
+(1, 'Follow'),
+(2, 'Unfollow'),
+(3, 'Same Here'),
+(4, 'Un Same Here'),
+(5, 'New Post');
+(6, 'Remove Post');
+
+INSERT INTO notification_types(id, background_color, is_user_icon, description, icon) VALUES 
+(1, '#3FA5F899', TRUE, 'Follow', ''),
+(2, '#3FA5F899', TRUE, 'Same Here', ''),
+(3, '#F4E94B99', FALSE, 'Reward', 'notifReward'),
+(4, '#c6f1e7', FALSE, 'Post Approved', 'postApproved'),
+(5, '#ffcbcb', FALSE, 'Post Rejected', 'postRejected');
 
 INSERT INTO public.regions(name)                VALUES ('North America');
 INSERT INTO public.countries(name, region_id)   VALUES ('Canada', 1);
@@ -135,3 +179,6 @@ INSERT INTO public.industries(name) VALUES ('Dentistry');
 
 INSERT INTO public.topics(name)                 VALUES ('Parking');
 INSERT INTO public.subtopics(name, topic_id)    VALUES ('Expensive', 1);
+
+INSERT INTO public.reject_reasons(description)    VALUES ('Incomplete Expression'), 
+('Age restricted topic'), ('Too much capittalisation'), ('Bad language'), ('Forbidden content');

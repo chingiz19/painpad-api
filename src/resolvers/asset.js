@@ -5,7 +5,7 @@ async function getLocations(parent, args, { req }) {
 
     let query = `
     SELECT 
-        cities.id, cities.name || ', ' || countries.name AS value
+        cities.id, cities.name || ', ' || countries.short_name AS value
     FROM 
         cities
     INNER JOIN states USING(id)

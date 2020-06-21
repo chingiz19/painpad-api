@@ -121,11 +121,11 @@ async function dropTable(tableName) {
  * Updates values in the table and auto generates parameters for 'pg'
  * 
  * @param {*} tableName table name
- * @param {*} inWhere can be and id or array of objects -> same as selectFromWhere
+ * @param {*} inWhere can be and id or array of objects -> same as above
  * @param {*} data update data where {column: value (to update to)}
  * @param {*} returning returning condition
  */
-async function updateValuesInTable(tableName, inWhere, data, returning = ['*']) {
+async function updateValuesInTable(tableName, inWhere, data, { returning = ['*'], rowCount = 0 } = {}) {
     let result;
     let where;
     let whereClause = [];
@@ -184,7 +184,7 @@ async function updateValuesInTable(tableName, inWhere, data, returning = ['*']) 
         console.error('Error => db.updateValuesInTable()', error.message);
     }
 
-    if (result && result.rows && result.rows.length > 0) {
+    if (result && result.rows && result.rows.length > rowCount) {
         return result.rows;
     }
 
@@ -259,7 +259,7 @@ async function deleteFromWhere(table, inWhere, returning = ['*']) {
 
 }
 
-async function selectFrom(fromTable, columns) {
+async function selectFrom(fromTable, columns = ['*']) {
     let result;
 
     let query = `
@@ -293,16 +293,24 @@ async function selectFrom(fromTable, columns) {
         useRaw: true/false  means insert into query as text
     }];
  */
-async function selectFromWhere(fromTable, columns, inWhere, groupBy) {
+async function selectFromWhere(fromTable, columns, inWhere, { groupBy = undefined, limit = undefined, rowCount = 0, orderBy =undefined } = {}) {
     let where;
     let whereClause = [];
     let params = [];
     let counter = 1;
-    let result;
-    let groupByClause = '';
+    let additionalSQL = '';
 
     if (groupBy) {
-        groupByClause = `GROUP BY ${groupBy.join(', ')}`;
+        additionalSQL = `GROUP BY ${groupBy.join(', ')}`;
+    }
+
+    if (orderBy) {
+        additionalSQL = `ORDER BY ${orderBy}`;
+    }
+
+    if (limit) {
+        additionalSQL += ` LIMIT $${counter}`
+        params.push(limit);
     }
 
     if (Array.isArray(inWhere)) {
@@ -338,19 +346,19 @@ async function selectFromWhere(fromTable, columns, inWhere, groupBy) {
         ${fromTable}
     WHERE
         ${whereClause.join(' AND ')}
-    ${groupByClause};`;
+    ${additionalSQL};`;
 
     try {
-        result = await connection.query({
+        let result = await connection.query({
             text: query,
             values: params
         });
+
+        if (result && result.rows && result.rows.length > rowCount) {
+            return result.rows;
+        }
     } catch (error) {
         console.error('Error => db.selectFrom()', error.message);
-    }
-
-    if (result && result.rows && result.rows.length > 0) {
-        return result.rows;
     }
 
     return false;

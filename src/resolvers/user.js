@@ -1,6 +1,7 @@
+const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const User = require('../models/User');
-const Feed = require('../models/Feed');
+const Email = require('../models/Email');
 
 const TABLE = 'users';
 const GENERIC_ERRROR = 'Unexpexted error occured while request';
@@ -80,16 +81,6 @@ async function stats(parent, { userId }, { req }) {
     return { following, followers }
 }
 
-async function posts(parent, { userId }, { req }) {
-    let firstPersonId = (req.session.user &&  req.session.user.id) || 0;
-
-    let result = await Feed.getUserFeed(firstPersonId, userId);
-
-    if (!result) throw new Error(GENERIC_ERRROR);
-
-    return result;
-}
-
 async function changeProfile(parent, args, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
@@ -114,11 +105,30 @@ async function follow(parent, { userIdToFollow }, { req }) {
         follows: userIdToFollow
     }
 
-    //TODO: notify user that is being followed (label -> notification)
-
     let result = await DB.insertValuesIntoTable('follows', insertData);
 
     if (!result) throw new Error(GENERIC_ERRROR);
+
+    const userResult = await User.getQuickInfo(userId);
+
+    if (!userResult) throw new Error('Error while implementing an action');
+
+    const userName = userResult.name;
+    const userProfilePic = userResult.profilePic;
+    const userIndustry = userResult.industry;
+
+    //TODO: check for recent activity
+
+    let notificationData = {
+        header: 'New Follower',
+        subheader: userName,
+        description: `From <span>${userIndustry}<span> started following you`,
+        action: `/users/${userId}`,
+        icon: userProfilePic,
+        typeId: 1
+    }
+
+    Subscriptions.notify(userIdToFollow, notificationData);
 
     return true
 }
@@ -173,7 +183,7 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
 
     let userId = payload.userId;
 
-    let selectResult = await DB.selectFromWhere(TABLE, ['*'], userId);
+    let selectResult = await DB.selectFromWhere(TABLE, ['INITCAP(first_name) AS "firstName", *'], userId);
 
     if (!selectResult) throw new Error('User is not found');
 
@@ -182,16 +192,16 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
     let newCompareResult = await Auth.comparePasswords(newPwd, user.password_hash);
 
     if (newCompareResult) throw new Error('New passwrod can not be same as old');
-    
+
     let updateData = { password_hash: await Auth.generatePassHash(newPwd) }
 
     let result = await DB.updateValuesInTable(TABLE, userId, updateData);
 
     if (!result) throw new Error(GENERIC_ERRROR);
 
-    //TODO: notify via email that user's password has been changed
+    Email.afterResetPasswordNotification(user.email, user.firstName);
 
     return true;
 }
 
-module.exports = { signin, signup, profile, signout, posts, stats, changeProfile, follow, changePassword, unFollow, resetPwd };
+module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd };

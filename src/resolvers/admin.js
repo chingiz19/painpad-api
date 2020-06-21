@@ -1,7 +1,9 @@
+const Subscriptions = require('../models/Subscriptions');
 const Auth = require('../models/Auth');
 const Admin = require('../models/Admin');
 const User = require('../models/User');
 const Feed = require('../models/Feed');
+const Email = require('../models/Email');
 
 const MATCH_SCORES = {
     OCCUPATION: 10,
@@ -71,7 +73,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     if (!currentUser) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    let postUserTotalScore = 1;
+    let currentUserTotalScore = 1;
     const currentUserId = currentUser.id;
     const currentOccupationId = currentUser.occupation;
     const currentIndustryId = currentUser.industry;
@@ -84,6 +86,8 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
     if (!subTopicPosts) throw new Error(APPROVE_ERROR_MESSAGE);
 
     for (const post of subTopicPosts) {
+        let postUserScore = 0;
+
         const postUserId = post.user.id;
 
         const postUserOccupationId = post.user.occupationId;
@@ -94,52 +98,152 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
         const postCountryId = post.countryId;
 
         if (currentOccupationId && postUserOccupationId && currentOccupationId === postUserOccupationId) {
-            postUserTotalScore += MATCH_SCORES.OCCUPATION;
-            User.incrementScore(postUserId, MATCH_SCORES.OCCUPATION);
+            postUserScore += MATCH_SCORES.OCCUPATION;
         }
 
         if (currentIndustryId === postUserIndustryId) {
-            postUserTotalScore += MATCH_SCORES.USER_INDUSTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.USER_INDUSTRY);
+            postUserScore += MATCH_SCORES.USER_INDUSTRY;
         }
 
         if (currentIndustryId === postIndustryId) {
-            postUserTotalScore += MATCH_SCORES.POST_INDUSTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.POST_INDUSTRY);
+            postUserScore += MATCH_SCORES.POST_INDUSTRY;
         }
 
         if (currentCityId === postCityId) {
-            postUserTotalScore += MATCH_SCORES.CITY;
-            User.incrementScore(postUserId, MATCH_SCORES.CITY);
+            postUserScore += MATCH_SCORES.CITY;
         }
 
         if (currentStateId === postStateId) {
-            postUserTotalScore += MATCH_SCORES.STATE;
-            User.incrementScore(postUserId, MATCH_SCORES.STATE);
+            postUserScore += MATCH_SCORES.STATE;
         }
 
         if (currentCountryId === postCountryId) {
-            postUserTotalScore += MATCH_SCORES.COUNTRY;
-            User.incrementScore(postUserId, MATCH_SCORES.COUNTRY);
+            postUserScore += MATCH_SCORES.COUNTRY;
         }
+
+        currentUserTotalScore += postUserScore;
+
+        User.incrementScore(postUserId, postUserScore);
     }
 
-    let topicUsers = await Admin.getTopicUsers(subTopicPosts[0].topicId);
+    //if other posts exist
+    if (subTopicPosts.length > 0) {
+        let topicUsers = await Admin.getTopicUsers(subTopicPosts[0].topicId);
 
-    if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
+        if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    for (const { userId } of topicUsers) User.incrementScore(userId);
+        for (const { id } of topicUsers) {
+            User.incrementScore(id);
+        }
+    }
 
     let result = await DB.insertValuesIntoTable('approved_posts', { post_id: postId, subtopic_id: subTopicId });
 
     if (!result) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    User.incrementScore(currentUserId, postUserTotalScore);
+    User.incrementScore(currentUserId, currentUserTotalScore);
 
-    //TODO: send push notification about being approved and total score
-    //TODO: send email notification about being approved and total score
+    let notificationData = {
+        header: 'Post Approved',
+        subheader: 'Congrats!',
+        description: `Your post has been has been approved by moderators`,
+        postId: postId,
+        action: `/posts/${postId}`,
+        typeId: 4
+    }
+
+    Subscriptions.notify(currentUserId, notificationData);
+
+    Subscriptions.newPost(postId);
 
     return true;
 }
 
-module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost }
+async function getRejectReasons(parent, args, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let result = await DB.selectFrom('reject_reasons', ['id', 'description AS value']);
+
+    if (!result) throw new Error('Error while getting reject reasons');
+
+    return result;
+}
+
+async function addRejectReason(parent, { reason }, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let select = await DB.selectFromWhere('reject_reasons', ['id'], [DB.whereObj('description', '=', reason)]);
+
+    if (select) throw new Error('Given reason already exists');
+
+    let result = await DB.insertValuesIntoTable('reject_reasons', { description: reason });
+
+    if (!result) throw new Error('Error inserting into a table');
+
+    return result.id;
+}
+
+async function rejectPost(parent, { postId, reasonId, explanation, suggestion }, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let selectReason = await DB.selectFromWhere('reject_reasons', ['description'], reasonId);
+
+    if (!selectReason) throw new Error('Given reason does not exist');
+
+    let selectApproved = await DB.selectFromWhere('approved_posts', ['id'], [DB.whereObj('post_id', '=', postId)]);
+
+    if (selectApproved) throw new Error('Approved posts can not be rejected');
+
+    let selectPost = await DB.selectFromWhere('posts', ['description', 'city_id', 'industry_id', 'user_id', 'created'], postId);
+
+    if (!selectPost) throw new Error('Post does not exist');
+
+    const postUserId = selectPost[0].user_id;
+
+    let insertObj = {
+        rejected_by: req.session.user.id,
+        posted_by: postUserId,
+        description: selectPost[0].description,
+        city_id: selectPost[0].city_id,
+        industry_id: selectPost[0].industry_id,
+        created: selectPost[0].created,
+        reason_id: reasonId,
+        explanation, suggestion
+    }
+
+    let insertPost = await DB.insertValuesIntoTable('rejected_posts', insertObj);
+
+    if (!insertPost) throw new Error('Error inserting into a table');
+
+    let deletePost = await DB.deleteFromWhere('posts', postId);
+
+    if (!deletePost) throw new Error('Error while deleting post from table');
+
+    const rejectReason = selectReason[0].description;
+    const rejectedPostId = insertPost.id;
+
+    let notificationData = {
+        header: 'Post Rejected',
+        subheader: 'Ooh no...',
+        description: `Your post has been has been rejected due to <span>${rejectReason}<span>`,
+        postId: rejectedPostId,
+        action: `/posts/${rejectedPostId}?rejected=true`,
+        typeId: 5
+    }
+
+    Subscriptions.notify(selectPost[0].user_id, notificationData);
+
+    let selectUserInfo = await DB.selectFromWhere('users', ['email', 'INITCAP(first_name) AS "firstName"'], postUserId);
+
+    if (!selectUserInfo) throw new Error('Error while retrieving user info for email notification');
+
+    const actionUrl = `https://painpad.co/posts/${rejectedPostId}?rejected=true`;
+    const firstName = selectUserInfo[0].firstName;
+    const email = selectUserInfo[0].email;
+
+    Email.afterResetPasswordNotification(email, firstName, actionUrl, rejectReason, { suggestion, explanation });
+
+    return true;
+}
+
+module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost, getRejectReasons, addRejectReason, rejectPost }

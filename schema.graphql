@@ -7,14 +7,18 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
-  userPosts(userId: ID!): [Post]!
+  posts(userId: ID, topicId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
+  rejectedPost(rejectedPostId: ID!): RejectedPost!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
-  userFeed(lastDate: Float, count: Int): [Post]!
   userPendingPosts: [PendingPost]!
   sameHereUsers(postId: ID!): [ShortUser]!
   adminPendingPosts: [PendingPost]!
   adminAllTopics: [Topic]!
+  adminGetRejectReasons: [Pair!]!
+  topicStats(topicId: ID!): TopicStats!
+  newNotificationCount: Int!
+  notifications(limit: Int): [Notification!]!
 }
 
 type Mutation {
@@ -45,11 +49,18 @@ type Mutation {
   adminAddTopic(name: String!): ID!
   adminAddSubTopic(name: String!, topicId: ID!): ID!
   adminApprovePost(postId: ID!, subTopicId: ID!): Boolean!
+  adminAddRejectReason(reason: String!): ID!
+  adminRejectPost(
+    postId: ID!
+    reasonId: ID!
+    explanation: String
+    suggestion: String
+  ): Boolean!
 }
 
 type Subscription {
-  newPost: Post
-  notification: Notification
+  newPost: Post!
+  newNotificationCount: Int
 }
 
 type Topic {
@@ -62,6 +73,7 @@ type subTopic {
   id: ID
   description: String
   topicId: ID
+  topicName: String
 }
 
 type Profile {
@@ -83,11 +95,6 @@ type User {
   score: Int!
 }
 
-type UserStats {
-  following: [ShortUser]!
-  followers: [ShortUser]!
-}
-
 type ShortUser {
   id: ID!
   firstName: String!
@@ -97,17 +104,36 @@ type ShortUser {
   occupation: String
 }
 
+type UserStats {
+  following: [ShortUser]!
+  followers: [ShortUser]!
+}
+
 type Post {
   id: ID!
   description: String!
   postedBy: ShortUser!
   created: Float!
   industry: String!
-  location: String!
+  location: Location!
+  subTopic: subTopic!
   approved: Float!
-  topic: Topic!
   sameHere: Int!
   sameHered: Boolean!
+}
+
+type RejectedPost {
+  id: ID!
+  description: String!
+  postedBy: ShortUser!
+  created: Float!
+  industry: String!
+  location: String!
+  rejected: Float!
+  rejectedBy: ShortUser!
+  reason: String!
+  explanation: String
+  suggestion: String
 }
 
 type PendingPost {
@@ -124,11 +150,34 @@ type Pair {
   value: String!
 }
 
+type Location {
+  countryId: ID!
+  countryName: String!
+  stateId: ID!
+  stateName: String!
+  cityId: ID!
+  cityName: String!
+}
+
 type Notification {
   id: ID!
-  descrption: String!
+  header: String!
+  subheader: String!
+  description: String!
   created: Float!
   icon: String!
+  action: String!
+  type: NotificationType!
+  postText: String
+  seen: Float
+}
+
+type NotificationType {
+  id: ID!
+  backgroundColor: String!
+  icon: String!
+  isUserIcon: Boolean!
+  description: String!
 }
 
 type AuthRes {
@@ -139,4 +188,42 @@ type AuthRes {
 type S3Response {
   uploadUrl: String!
   fileUrl: String!
+}
+
+type TopicStats {
+  topicName: String!
+  weights: TopicWeights!
+  subTopicStats: [SubTopicStats!]!
+  topicCountryStats: [TopicCountryStats!]!
+}
+
+type SubTopicStats {
+  subTopicId: ID!
+  subTopicName: String!
+  sameHereCount: Float!
+  userPoints: Float!
+  postCount: Float!
+}
+
+type TopicCountryStats {
+  countryId: ID!
+  countryName: String!
+  postCount: Int!
+  sameHereCount: Float!
+}
+
+type TopicWeights {
+  subTopicWeights: subTopicWeights!
+  countryWeights: countryWeights!
+}
+
+type subTopicWeights {
+  postCount: Float!
+  userPoint: Float!
+  sameHere: Float!
+}
+
+type countryWeights {
+  postCount: Float!
+  sameHere: Float!
 }

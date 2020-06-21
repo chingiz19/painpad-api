@@ -3,6 +3,7 @@ const AWS = require('./aws');
 const Feed = require('./feed');
 const Admin = require('./admin');
 const Asset = require('./asset');
+const Topic = require('./topic');
 const Auth = require('../models/Auth');
 
 module.exports = {
@@ -16,10 +17,14 @@ module.exports = {
   userStats: User.stats,
   signout: User.signout,
   signS3: AWS.signS3,
-  userFeed: Feed.userFeed,
-  userPosts: User.posts,
+  posts: Feed.posts,
+  rejectedPost: Feed.getRejectedPost,
   userPendingPosts: Feed.pendingPosts,
   sameHereUsers: Feed.sameHereUsers,
   adminPendingPosts: Admin.pedningPosts,
-  adminAllTopics: Admin.allTopics
+  adminAllTopics: Admin.allTopics,
+  adminGetRejectReasons: Admin.getRejectReasons,
+  topicStats: Topic.getTopicStats,
+  newNotificationCount: Feed.newNotificationCount,
+  notifications: Feed.notifications
 };
