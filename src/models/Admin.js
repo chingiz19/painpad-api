@@ -36,7 +36,7 @@ async function getSubTopicPosts(subTopicId) {
     INNER JOIN cities ON posts.city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
-    INNER JOIN 
+    INNER JOIN
     (SELECT
         users.id, json_build_object('id', users.id, 'industryId', industries.id, 'occupationId', occupations.id) AS obj
     FROM users

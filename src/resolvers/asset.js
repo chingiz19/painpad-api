@@ -5,11 +5,12 @@ async function getLocations(parent, args, { req }) {
 
     let query = `
     SELECT 
-        cities.id, cities.name || ', ' || countries.short_name AS value
+        cities.id, cities.name || ', ' || ISO_3_code.name AS value
     FROM 
         cities
     INNER JOIN states USING(id)
     INNER JOIN countries ON states.country_id = countries.id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     WHERE
         LOWER(cities.name) LIKE ($1 || '%')
     LIMIT $2;`;

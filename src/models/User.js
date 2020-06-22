@@ -13,7 +13,7 @@ async function getUserInformation(userId) {
             'profilePic', profile_pic,
             'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'Please select')),
             'industry', json_build_object('id', industries.id, 'value', industries.name),
-            'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || countries.short_name),
+            'location', json_build_object('id', cities.id, 'value', cities.name || ', ' || ISO_3_code.name),
             'since',  extract(epoch from since) * 1000
         ) AS info
     FROM users
@@ -22,6 +22,7 @@ async function getUserInformation(userId) {
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON state_id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     WHERE users.id=${userId};`;
 
     let result = await DB.incubate(query);

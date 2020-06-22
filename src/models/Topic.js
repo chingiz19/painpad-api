@@ -19,8 +19,8 @@ async function subTopicStats(topicId) {
 
 async function topicCountryStats(topicId) {
     let query = `
-    SELECT countries.id AS "countryId", countries.short_name AS "countryName", COUNT(posts.id) AS "postCount", COALESCE (same_heres.count, 0) AS "sameHereCount"
-    FROM public.posts  
+    SELECT countries.id AS "countryId", ISO_3_code.name AS "countryName", COUNT(posts.id) AS "postCount", COALESCE (same_heres.count, 0) AS "sameHereCount"
+    FROM public.posts
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = ap.subtopic_id
     INNER JOIN cities ON posts.city_id = cities.id
@@ -36,6 +36,7 @@ async function topicCountryStats(topicId) {
         INNER JOIN cities ON posts.city_id = cities.id
         INNER JOIN states ON states.id = cities.state_id
         INNER JOIN countries ON countries.id = states.country_id
+        INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
         WHERE subtopics.topic_id = $1
         GROUP BY 1) AS same_heres ON same_heres.country_id = countries.id
     WHERE subtopics.topic_id = $1

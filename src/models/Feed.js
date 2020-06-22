@@ -38,7 +38,7 @@ async function getUserFeed(firstPersonId, { userId, topicId, postId, lastDate, c
         extract(epoch from ap.approved) * 1000 AS approved,
         json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)) AS "subTopic",
         json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
-                                    'countryId', countries.id, 'countryName', countries.short_name) AS location,
+                                    'countryId', countries.id, 'countryName', ISO_3_code.name) AS location,
         COALESCE(sh.count, 0) AS "sameHere",
         COALESCE(sh.same_hered, FALSE) AS "sameHered",
         users.obj AS "postedBy" 
@@ -50,6 +50,7 @@ async function getUserFeed(firstPersonId, { userId, topicId, postId, lastDate, c
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     LEFT JOIN (SELECT post_id, count(user_id), ${firstPersonId}=ANY(array_agg(user_id)) AS same_hered FROM same_heres GROUP BY post_id) AS sh ON sh.post_id = ap.post_id
     INNER JOIN 
     (SELECT
@@ -94,7 +95,7 @@ async function getPendingPosts(userId) {
             'description', posts.description,
             'created', extract(epoch from posts.created) * 1000,
             'industry', INITCAP(industries.name),
-            'location', cities.name || ', ' || countries.short_name,
+            'location', cities.name || ', ' || ISO_3_code.name AS value,
             'postedBy', users.obj
         ) ORDER BY COALESCE(ap.approved, posts.created)) AS posts
     FROM posts
@@ -103,6 +104,7 @@ async function getPendingPosts(userId) {
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     INNER JOIN 
     (SELECT
         users.id,
@@ -180,7 +182,7 @@ async function getUserRejectedPost(userId, rejectedPostId) {
             'description', rejected_posts.description,
             'created', extract(epoch from rejected_posts.created) * 1000,
             'industry', INITCAP(industries.name),
-            'location', cities.name || ', ' || countries.short_name,
+            'location', cities.name || ', ' || ISO_3_code.name,
             'postedBy', post_users.obj,
             'rejected', extract(epoch from rejected_posts.rejected) * 1000,
             'reason', reject_reasons.description,
@@ -192,6 +194,7 @@ async function getUserRejectedPost(userId, rejectedPostId) {
     INNER JOIN cities ON rejected_posts.city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     INNER JOIN reject_reasons ON reject_reasons.id = rejected_posts.reason_id
     INNER JOIN 
     (SELECT
