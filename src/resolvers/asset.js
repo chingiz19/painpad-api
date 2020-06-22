@@ -8,7 +8,7 @@ async function getLocations(parent, args, { req }) {
         cities.id, cities.name || ', ' || ISO_3_code.name AS value
     FROM 
         cities
-    INNER JOIN states USING(id)
+    INNER JOIN states ON cities.state_id = states.id
     INNER JOIN countries ON states.country_id = countries.id
     INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     WHERE
