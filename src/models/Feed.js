@@ -95,7 +95,7 @@ async function getPendingPosts(userId) {
             'description', posts.description,
             'created', extract(epoch from posts.created) * 1000,
             'industry', INITCAP(industries.name),
-            'location', cities.name || ', ' || ISO_3_code.name AS value,
+            'location', cities.name || ', ' || ISO_3_code.name,
             'postedBy', users.obj
         ) ORDER BY COALESCE(ap.approved, posts.created)) AS posts
     FROM posts
