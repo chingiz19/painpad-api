@@ -16,11 +16,11 @@ const WEIGHTS = {
 async function getTopicStats(parent, { topicId }, { req }) {
     let topicResult = await DB.selectFromWhere('topics', ['name'], topicId);
 
-    if (!topicResult) throw new Error('Error while retrieving topic stats');
+    if (!topicResult) throw new Error('Error while retrieving topic results');
 
     let subTopicStats = await Topic.subTopicStats(topicId);
 
-    if (!subTopicStats) throw new Error('Error while retrieving topic stats');
+    if (!subTopicStats) throw new Error('Error while retrieving subtopic stats');
 
     let topicCountryStats = await Topic.topicCountryStats(topicId);
 

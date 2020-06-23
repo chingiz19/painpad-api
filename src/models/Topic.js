@@ -26,6 +26,7 @@ async function topicCountryStats(topicId) {
     INNER JOIN cities ON posts.city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
+    INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     LEFT JOIN (
         SELECT countries.id AS country_id, COUNT(same_heres.user_id)
         FROM same_heres
@@ -36,7 +37,6 @@ async function topicCountryStats(topicId) {
         INNER JOIN cities ON posts.city_id = cities.id
         INNER JOIN states ON states.id = cities.state_id
         INNER JOIN countries ON countries.id = states.country_id
-        INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
         WHERE subtopics.topic_id = $1
         GROUP BY 1) AS same_heres ON same_heres.country_id = countries.id
     WHERE subtopics.topic_id = $1
