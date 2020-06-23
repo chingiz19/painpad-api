@@ -117,7 +117,8 @@ async function getPendingPosts(userId) {
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
     INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
-    WHERE approved IS NULL ${whereStr};`;
+    WHERE approved IS NULL ${whereStr}
+    ORDER BY posts.created DESC;`;
 
     let result = await DB.incubate(query, params);
 
