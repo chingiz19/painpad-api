@@ -97,7 +97,7 @@ async function getPendingPosts(userId) {
             'industry', INITCAP(industries.name),
             'location', cities.name || ', ' || ISO_3_code.name,
             'postedBy', users.obj
-        ) ORDER BY COALESCE(ap.approved, posts.created)) AS posts
+        ) ORDER BY COALESCE(ap.approved, posts.created) DESC) AS posts
     FROM posts
     LEFT JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN industries ON industry_id = industries.id
@@ -117,9 +117,7 @@ async function getPendingPosts(userId) {
     FROM users
     LEFT JOIN occupations ON users.occupation_id = occupations.id
     INNER JOIN industries ON industry_id = industries.id) AS users ON users.id = posts.user_id
-    WHERE approved IS NULL ${whereStr}
-    GROUP BY posts.created
-    ORDER BY posts.created DESC;`;
+    WHERE approved IS NULL ${whereStr}`;
 
     let result = await DB.incubate(query, params);
 
