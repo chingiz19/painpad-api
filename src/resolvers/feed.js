@@ -158,12 +158,12 @@ async function newNotificationCount(parent, args, { req }) {
     return newCount;
 }
 
-async function notifications(parent, { limit }, { req }) {
+async function notifications(parent, { limit, lastDate}, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     const userId = req.session.user.id;
 
-    const result = await Feed.getNotifications(userId);
+    const result = await Feed.getNotifications(userId, lastDate, limit);
 
     if (!result) throw new Error('Unexpected error while getting notifications from DB');
 

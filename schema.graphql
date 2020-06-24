@@ -18,7 +18,7 @@ type Query {
   adminGetRejectReasons: [Pair!]!
   topicStats(topicId: ID!): TopicStats!
   newNotificationCount: Int!
-  notifications(limit: Int): [Notification!]!
+  notifications(limit: Int, lastDate: Float): [Notification!]!
 }
 
 type Mutation {

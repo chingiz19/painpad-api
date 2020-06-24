@@ -151,7 +151,31 @@ async function sameHereUsers(postId) {
     return result[0].users || [];
 }
 
-async function getNotifications(userId) {
+async function getNotifications(userId, lastDate, limit) {
+    let whereStr = '';
+    let limitStr = '';
+    let whereArr = [];
+    let counter = 1;
+    let params = [];
+
+    if (lastDate) {
+        whereArr.push(`(extract(epoch from notifications.created) * 1000)  < $${counter}`);
+        params.push(lastDate);
+        counter++;
+    }
+
+    if (userId) {
+        whereArr.push(`notifications.user_id=$${counter}`);
+        params.push(userId);
+        counter++;
+    }
+
+    if (whereArr.length > 0) whereStr = `WHERE ${whereArr.join(' AND ')}`;
+
+    if (limit) {
+        limitStr = `Limit ${limit}`;
+    }
+
     let query = `
     SELECT 
         notifications.id, notifications.header, notifications.subheader, 
@@ -168,8 +192,9 @@ async function getNotifications(userId) {
     INNER JOIN notification_types AS nt ON nt.id = notifications.type_id
     LEFT JOIN posts AS p ON p.id = notifications.post_id
     LEFT JOIN rejected_posts AS rp ON rp.id = notifications.post_id
-    WHERE notifications.user_id = ${userId}
-    ORDER BY created DESC;`;
+    ${whereStr}
+    ORDER BY created DESC
+    ${limitStr};`;
 
     return await DB.incubate(query);
 }
