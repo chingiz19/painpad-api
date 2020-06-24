@@ -196,7 +196,7 @@ async function getNotifications(userId, lastDate, limit) {
     ORDER BY created DESC
     ${limitStr};`;
 
-    return await DB.incubate(query);
+    return await DB.incubate(query, params);
 }
 
 async function getUserRejectedPost(userId, rejectedPostId) {
