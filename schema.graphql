@@ -7,7 +7,7 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
-  posts(userId: ID, topicId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
+  posts(userId: ID, topicId: ID, subTopicId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
   rejectedPost(rejectedPostId: ID!): RejectedPost!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
