@@ -17,10 +17,10 @@ async function getUserInformation(userId) {
             'since',  extract(epoch from since) * 1000
         ) AS info
     FROM users
-    LEFT JOIN occupations ON occupation_id = occupations.id
-    INNER JOIN industries ON industry_id = industries.id
-    INNER JOIN cities ON city_id = cities.id
-    INNER JOIN states ON state_id = cities.state_id
+    LEFT JOIN occupations ON occupations.id = users.occupation_id
+    INNER JOIN industries ON industries.id = users.industry_id
+    INNER JOIN cities ON cities.id = users.city_id
+    INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
     INNER JOIN ISO_3_code ON ISO_3_code.id = countries.iso_3_code_id
     WHERE users.id=${userId};`;
