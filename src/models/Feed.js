@@ -24,7 +24,7 @@ async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, postId,
 
     if (subTopicId) {
         whereArr.push(`subtopics.id=$${counter}`);
-        params.push(topicId);
+        params.push(subTopicId);
         counter++;
     }
 
