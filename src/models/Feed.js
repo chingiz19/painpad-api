@@ -1,4 +1,4 @@
-async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, postId, lastDate, count = 20}) {
+async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, countryId, postId, lastDate, count = 20}) {
     let whereStr = '';
     let whereArr = [];
     let counter = 1;
@@ -25,6 +25,12 @@ async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, postId,
     if (subTopicId) {
         whereArr.push(`subtopics.id=$${counter}`);
         params.push(subTopicId);
+        counter++;
+    }
+
+    if (countryId) {
+        whereArr.push(`countries.id=$${counter}`);
+        params.push(countryId);
         counter++;
     }
 
