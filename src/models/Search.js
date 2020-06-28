@@ -2,14 +2,13 @@ async function searchUsers(text, limit) {
     let params = [text];
 
     let query = `
-    SELECT json_build_object(
-            'id', users.id,
-            'firstName', INITCAP(first_name),
-            'lastName', INITCAP(last_name),
-            'profilePic', profile_pic,
-            'industry', json_build_object('id', industries.id, 'value', industries.name),
-            'occupation', json_build_object('id', COALESCE(occupations.id, 0), 'value', COALESCE(occupations.name, 'Please select'))
-        ) AS info
+    SELECT 
+        users.id AS id,
+        INITCAP(first_name) AS "firstName",
+        INITCAP(last_name) AS "lastName",
+        profile_pic AS "profilePic",
+        industries.name AS industry,
+        COALESCE(occupations.name, 'Please select') AS occupation
     FROM users
     LEFT JOIN industries 
         ON industries.id = users.industry_id
