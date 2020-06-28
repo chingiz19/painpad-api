@@ -1,24 +1,25 @@
 type Query {
-  isLogin: AuthRes!
-  isAdmin: Boolean!
-  locations(text: String!, limit: Int!): [Pair!]!
-  industries(text: String!, limit: Int!): [Pair!]!
-  occupations(text: String!, limit: Int!): [Pair!]!
-  signin(email: String!, pwd: String!): Boolean!
-  userProfile(userId: ID!): Profile!
-  userStats(userId: ID!): UserStats!
-  posts(userId: ID, topicId: ID, subTopicId: ID, countryId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
-  rejectedPost(rejectedPostId: ID!): RejectedPost!
-  signout: Boolean!
-  signS3(fileName: String!, fileType: String!): S3Response!
-  userPendingPosts: [PendingPost]!
-  sameHereUsers(postId: ID!): [ShortUser]!
-  adminPendingPosts: [PendingPost]!
   adminAllTopics: [Topic]!
   adminGetRejectReasons: [Pair!]!
-  topicStats(topicId: ID!): TopicStats!
+  adminPendingPosts: [PendingPost]!
+  isAdmin: Boolean!
+  industries(text: String!, limit: Int!): [Pair!]!
+  isLogin: AuthRes!
+  locations(text: String!, limit: Int!): [Pair!]!
   newNotificationCount: Int!
   notifications(limit: Int, lastDate: Float): [Notification!]!
+  occupations(text: String!, limit: Int!): [Pair!]!
+  posts(userId: ID, topicId: ID, subTopicId: ID, countryId: ID, postId: ID, lastDate: Float, count: Int): [Post]!
+  rejectedPost(rejectedPostId: ID!): RejectedPost!
+  sameHereUsers(postId: ID!): [ShortUser]!
+  search(text: String!): SearchResult!
+  signin(email: String!, pwd: String!): Boolean!
+  signout: Boolean!
+  signS3(fileName: String!, fileType: String!): S3Response!
+  topicStats(topicId: ID!): TopicStats!
+  userProfile(userId: ID!): Profile!
+  userStats(userId: ID!): UserStats!
+  userPendingPosts: [PendingPost]!
 }
 
 type Mutation {
@@ -226,4 +227,10 @@ type subTopicWeights {
 type countryWeights {
   postCount: Float!
   sameHere: Float!
+}
+
+type SearchResult{
+  users: [ShortUser]!
+  topicPosts: [Post]!
+  locationPosts: [Post]!
 }

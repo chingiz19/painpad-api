@@ -1,30 +1,32 @@
-const User = require('./user');
-const AWS = require('./aws');
-const Feed = require('./feed');
 const Admin = require('./admin');
 const Asset = require('./asset');
-const Topic = require('./topic');
 const Auth = require('../models/Auth');
+const AWS = require('./aws');
+const Feed = require('./feed');
+const Search = require('./search');
+const Topic = require('./topic');
+const User = require('./user');
 
 module.exports = {
-  isLogin: (parent, args, { req }) => Auth.isLoggedin(req),
-  isAdmin: (parent, args, { req }) => Auth.isAdminAuthorised(req),
-  locations: Asset.getLocations,
-  industries: Asset.getIndustries,
-  occupations: Asset.getOccupations,
-  signin: User.signin,
-  userProfile: User.profile,
-  userStats: User.stats,
-  signout: User.signout,
-  signS3: AWS.signS3,
-  posts: Feed.posts,
-  rejectedPost: Feed.getRejectedPost,
-  userPendingPosts: Feed.pendingPosts,
-  sameHereUsers: Feed.sameHereUsers,
-  adminPendingPosts: Admin.pedningPosts,
   adminAllTopics: Admin.allTopics,
   adminGetRejectReasons: Admin.getRejectReasons,
-  topicStats: Topic.getTopicStats,
+  adminPendingPosts: Admin.pedningPosts,
+  isAdmin: (parent, args, { req }) => Auth.isAdminAuthorised(req),
+  industries: Asset.getIndustries,
+  isLogin: (parent, args, { req }) => Auth.isLoggedin(req),
+  locations: Asset.getLocations,
   newNotificationCount: Feed.newNotificationCount,
-  notifications: Feed.notifications
+  notifications: Feed.notifications,
+  occupations: Asset.getOccupations,
+  posts: Feed.posts,
+  rejectedPost: Feed.getRejectedPost,
+  sameHereUsers: Feed.sameHereUsers,
+  search: Search.search,
+  signin: User.signin,
+  signout: User.signout,
+  signS3: AWS.signS3,
+  topicStats: Topic.getTopicStats,
+  userPendingPosts: Feed.pendingPosts,
+  userProfile: User.profile,
+  userStats: User.stats
 };
