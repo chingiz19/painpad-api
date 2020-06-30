@@ -246,4 +246,14 @@ async function rejectPost(parent, { postId, reasonId, explanation, suggestion },
     return true;
 }
 
-module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost, getRejectReasons, addRejectReason, rejectPost }
+async function getAdminAnalytics(parent, { }, { req }) {
+    if (!Auth.isAdminAuthorised(req)) throw new Auth.AdminAuthenticationError();
+
+    let result = await Admin.getAdminAnalytics();
+
+    if (!result) throw new Error('Error while getting admin analytics');
+
+    return result;
+}
+
+module.exports = { pedningPosts, allTopics, addTopic, addSubTopic, approvePost, getRejectReasons, addRejectReason, rejectPost, getAdminAnalytics}

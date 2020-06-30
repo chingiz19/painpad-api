@@ -9,6 +9,7 @@ const User = require('./user');
 
 module.exports = {
   adminAllTopics: Admin.allTopics,
+  adminAnalytics: Admin.getAdminAnalytics,
   adminGetRejectReasons: Admin.getRejectReasons,
   adminPendingPosts: Admin.pedningPosts,
   isAdmin: (parent, args, { req }) => Auth.isAdminAuthorised(req),

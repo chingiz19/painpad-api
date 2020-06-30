@@ -88,4 +88,46 @@ async function getTopicUsers(topicId) {
     return result[0].users || [];
 }
 
-module.exports = { getAllTopics, getSubTopicPosts, getPostUser, getTopicUsers }
+async function getAdminAnalytics() {
+    let query = `
+    WITH CTE_USER AS(
+        SELECT 1 AS id, COUNT(id) AS users_cnt
+        FROM users
+    ),
+    CTE_posts AS(
+        SELECT 1 AS id, COUNT(ID) AS posts_cnt
+        FROM posts
+    ),
+    CTE_same_here AS(
+        SELECT 1 AS id, COUNT(ID) AS same_here_cnt
+        FROM same_heres
+    ),
+    CTE_PP AS(
+        SELECT 1 AS id, COUNT(CASE WHEN ap.approved IS NULL THEN 1 END) AS pending_posts_cnt
+        FROM posts
+        LEFT JOIN approved_posts as ap
+            ON ap.post_id = posts.id
+    )
+    
+    SELECT json_build_object(
+                'usersCnt', CTE_USER.users_cnt,
+                'postsCnt', CTE_posts.posts_cnt,
+                'sameHereCnt', CTE_same_here.same_here_cnt,
+                'pendingPostsCnt', CTE_PP.pending_posts_cnt
+        ) AS "adminAnalytics"
+    FROM CTE_USER
+    LEFT JOIN CTE_posts
+        ON CTE_posts.id = CTE_USER.id
+    LEFT JOIN CTE_same_here 
+        ON CTE_same_here.id = CTE_posts.id
+    LEFT JOIN CTE_PP
+        ON CTE_PP.id = CTE_same_here.id`;
+
+    let result = await DB.incubate(query);
+
+    if (!result) return false;
+
+    return result[0].adminAnalytics|| {};
+}
+
+module.exports = { getAllTopics, getSubTopicPosts, getPostUser, getTopicUsers, getAdminAnalytics}

@@ -1,5 +1,6 @@
 type Query {
   adminAllTopics: [Topic]!
+  adminAnalytics: Analytics!
   adminGetRejectReasons: [Pair!]!
   adminPendingPosts: [PendingPost]!
   isAdmin: Boolean!
@@ -233,4 +234,11 @@ type SearchResult{
   users: [ShortUser]!
   topicPosts: [Post]!
   locationPosts: [Post]!
+}
+
+type Analytics{
+  usersCnt: Int!
+  postsCnt: Int!
+  sameHereCnt: Int!
+  pendingPostsCnt: Int!
 }
