@@ -9,7 +9,7 @@ const GENERIC_ERRROR = 'Unexpexted error occured while request';
 async function signin(parent, { email, pwd }, { req }) {
     if (Auth.isUserAuthorised(req)) throw new Error('Already signed in');
 
-    const ERROR_MESSAGE = 'Email or password is wrong';
+    const ERROR_MESSAGE = 'Email or password is incorrect';
 
     let whereObj = DB.whereObj('email', '=', email.toLowerCase());
 
