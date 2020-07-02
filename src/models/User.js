@@ -102,7 +102,7 @@ async function changeUserProfile(userId, args) {
     return await DB.updateValuesInTable('users', userId, updates);
 }
 
-async function incrementScore(userId, incrementBy = 1) {
+async function incrementScore(userId, incrementBy = 1, description) {
     let select = await DB.selectFromWhere('users', ['score'], userId);
 
     if (!select) {
@@ -122,8 +122,9 @@ async function incrementScore(userId, incrementBy = 1) {
 
     let notificationData = {
         header: 'Score Boost',
-        subheader: `${incrementBy} new point${incrementBy === 1 ? 's' : ''}!`,
-        description: `Your score has been promoted from <span> ${currentScore} to ${updatedScore}<span> for engagement`,
+        subheader: `${incrementBy} new point${incrementBy === 1 ? '' : 's'}!`,
+        // description: `Your score has been promoted from <span> ${currentScore} to ${updatedScore}<span> for engagement`,
+        description: description,
         action: `/users/${userId}`,
         typeId: 3
     }

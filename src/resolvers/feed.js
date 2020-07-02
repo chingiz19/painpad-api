@@ -69,14 +69,14 @@ async function sameHere(parent, { postId, add }, { req }) {
         const postUserId = postUserResult[0].user_id;
 
         if (postUserId !== userId) {
-            User.incrementScore(postUserId);
+            User.incrementScore(postUserId, 1, "Congrats! Your post is getting more attention");
 
             //TODO: check for recent activity
 
             let notificationData = {
                 header: 'New Same-here',
                 subheader: userName,
-                description: `From <span>${userIndustry}<span> just agreed with your post`,
+                description: `From ${userIndustry} just <span>agreed</span> with your post`,
                 postId: postId,
                 action: `/posts/${postId}`,
                 icon: userProfilePic,

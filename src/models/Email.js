@@ -4,7 +4,7 @@ const Auth = require('./Auth');
 const RESET_PASSWORD_LINK = 'https://painpad.co/resetPass/';
 
 const FROM_ADDRESS = 'hello@painpad.co';
-const FROM_NAME = 'PainPad Inc.';
+const FROM_NAME = 'PainPad';
 const RESET_PASSWORD_TEMPLATE_ID = 'd-0832480438e94e4284d1315a5328e0c2';
 const AFTER_RESET_PASSWORD_NOTIFICATION_TEMPLATE_ID = 'd-a1b6f8efcbfc4502a999b04d9c625806';
 const REJECTED_POST_TEMPLATE_ID = 'd-9fafacff7a46403a8f607f74ff3c7306';

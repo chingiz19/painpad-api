@@ -123,7 +123,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
         currentUserTotalScore += postUserScore;
 
-        User.incrementScore(postUserId, postUserScore);
+        // User.incrementScore(postUserId, postUserScore);
     }
 
     //if other posts exist
@@ -133,7 +133,8 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
         if (!topicUsers) throw new Error(APPROVE_ERROR_MESSAGE);
 
         for (const { id } of topicUsers) {
-            User.incrementScore(id);
+            // User.incrementScore(id);
+            currentUserTotalScore += 1;
         }
     }
 
@@ -141,7 +142,7 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
     if (!result) throw new Error(APPROVE_ERROR_MESSAGE);
 
-    User.incrementScore(currentUserId, currentUserTotalScore);
+    User.incrementScore(currentUserId, currentUserTotalScore, "Thanks for sharing your 'pain'");
 
     let notificationData = {
         header: 'Post Approved',
