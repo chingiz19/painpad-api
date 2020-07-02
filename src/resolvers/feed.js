@@ -76,7 +76,7 @@ async function sameHere(parent, { postId, add }, { req }) {
             let notificationData = {
                 header: 'New Same-here',
                 subheader: userName,
-                description: `From ${userIndustry} just <span>agreed</span> with your post`,
+                description: `From ${userIndustry} just <span>agreed<span> with your post`,
                 postId: postId,
                 action: `/posts/${postId}`,
                 icon: userProfilePic,
