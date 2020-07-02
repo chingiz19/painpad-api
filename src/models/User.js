@@ -103,6 +103,16 @@ async function changeUserProfile(userId, args) {
 }
 
 async function incrementScore(userId, incrementBy = 1, description) {
+    let select = await DB.selectFromWhere('users', ['score'], userId);
+
+    if (!select) {
+        console.error('Error while retrieving users', userId, 'score');
+        return false;
+    }
+
+    const currentScore = select[0].score;
+    const updatedScore = currentScore + incrementBy;
+
     let result = await DB.updateValuesInTable('users', userId, { score: updatedScore });
 
     if (!result) {
