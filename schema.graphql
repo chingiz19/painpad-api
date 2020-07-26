@@ -48,6 +48,8 @@ type Mutation {
   post(description: String!, cityId: ID!, industryId: ID!): Boolean!
   sameHere(postId: ID!, add: Boolean!): Boolean!
   removePost(postId: ID!): Boolean!
+  addOccupation(name: String!): ID!
+  addIndustry(name: String!): ID!
   adminAddTopic(name: String!): ID!
   adminAddSubTopic(name: String!, topicId: ID!): ID!
   adminApprovePost(postId: ID!, subTopicId: ID!): Boolean!

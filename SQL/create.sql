@@ -74,7 +74,7 @@ CREATE TABLE users (
     password_hash      TEXT                                NOT NULL,
     score              INTEGER                             NOT NULL    DEFAULT 0,
     email_verified     BOOLEAN                             NOT NULL    DEFAULT FALSE,
-    profile_pic        TEXT                                NOT NULL    DEFAULT 'https://painpad-profile-pictures.s3.amazonaws.com/painpad_default',
+    profile_pic        TEXT                                NOT NULL    DEFAULT 'https://painpad-profile-pictures.s3-us-west-1.amazonaws.com/painpad_default.jpg',
     p_level            INTEGER                             NOT NULL    DEFAULT 2,     
     occupation_id      INTEGER                             REFERENCES occupations(id),
     industry_id        INTEGER                             REFERENCES industries(id),

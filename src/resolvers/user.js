@@ -204,4 +204,37 @@ async function resetPwd(parent, { newPwd, token }, { req }) {
     return true;
 }
 
-module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd };
+async function addOccupation(parent, { name }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    let select = await DB.selectFromWhere('occupations', ['id'], [DB.whereObj('name', '=', name)]);
+
+    if (select) throw new Error('Given occupation already exists');
+
+    let result = await DB.insertValuesIntoTable('occupations', { name });
+
+    if (!result) throw new Error('Error while adding occupation');
+
+    return result.id;
+}
+
+async function addIndustry(parent, { name }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    let select = await DB.selectFromWhere('industries', ['id'], [DB.whereObj('name', '=', name)]);
+
+    if (select) throw new Error('Given industry already exists');
+
+    let data = {
+        name: name,
+        parent_industry_id: 25
+    }
+
+    let result = await DB.insertValuesIntoTable('industries', data);
+
+    if (!result) throw new Error('Error while adding industry');
+
+    return result.id;
+}
+
+module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd, addOccupation, addIndustry };

@@ -4,19 +4,21 @@ const Admin = require('./admin');
 const Email = require('../models/Email');
 
 module.exports = {
-  signup: User.signup,
+  addOccupation: User.addOccupation,
+  addIndustry: User.addIndustry,
+  adminAddSubTopic: Admin.addSubTopic,
+  adminAddRejectReason: Admin.addRejectReason,
+  adminApprovePost: Admin.approvePost,
+  adminAddTopic: Admin.addTopic,
+  adminRejectPost: Admin.rejectPost,
   changeProfile: User.changeProfile,
   changePwd: User.changePassword,
   follow: User.follow,
-  unFollow: User.unFollow,
   forgotPwd: Email.resetPassword,
-  resetPwd: User.resetPwd,
   post: Feed.post,
-  sameHere: Feed.sameHere,
-  adminAddTopic: Admin.addTopic,
-  adminAddSubTopic: Admin.addSubTopic,
-  adminApprovePost: Admin.approvePost,
   removePost: Feed.removePost,
-  adminAddRejectReason: Admin.addRejectReason,
-  adminRejectPost: Admin.rejectPost
+  resetPwd: User.resetPwd,
+  sameHere: Feed.sameHere,
+  signup: User.signup,
+  unFollow: User.unFollow
 };
