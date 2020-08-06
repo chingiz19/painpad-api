@@ -30,8 +30,16 @@ async function getTopicStats(parent, { topicId }, { req }) {
         subTopicStats,
         topicName: topicResult[0].name,
         topicCountryStats,
-        weights : WEIGHTS
+        weights: WEIGHTS
     }
 }
 
-module.exports = { getTopicStats }
+async function getTopicList(parent, { }, { req }) {
+    let topicList = await Topic.topicList();
+
+    if (!topicList) throw new Error('Error while retrieving topic list');
+
+    return topicList;
+}
+
+module.exports = { getTopicStats, getTopicList }

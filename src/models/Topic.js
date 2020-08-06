@@ -45,4 +45,31 @@ async function topicCountryStats(topicId) {
     return await DB.incubate(query, [topicId]);
 }
 
-module.exports = { subTopicStats, topicCountryStats }
+async function topicList() {
+    let query = `
+    WITH CTE_1 AS (
+        SELECT json_agg(json_build_object(
+            'value', id,
+            'label', LOWER(name))
+            ORDER BY LOWER(name)) AS topics
+        FROM topics
+        WHERE LOWER(name) NOT LIKE 'other'
+    ),
+    CTE_2 AS(
+        SELECT json_agg(json_build_object(
+            'value', id,
+            'label', name)) AS topics
+        FROM topics
+        WHERE LOWER(name) LIKE 'other'
+    )
+    
+    SELECT * FROM CTE_1
+    UNION ALL
+    SELECT * FROM CTE_2`;
+    
+    let result = await DB.incubate(query, []);
+
+    return result[0].topics.concat(result[1].topics);
+}
+
+module.exports = { subTopicStats, topicCountryStats, topicList}

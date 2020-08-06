@@ -17,6 +17,7 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
+  topicList: [TopicList]!
   topicStats(topicId: ID!): TopicStats!
   userProfile(userId: ID!): Profile!
   userStats(userId: ID!): UserStats!
@@ -243,4 +244,9 @@ type Analytics{
   postsCnt: Int!
   sameHereCnt: Int!
   pendingPostsCnt: Int!
+}
+
+type TopicList{
+  value: Int!
+  label: String!
 }
