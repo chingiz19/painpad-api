@@ -46,7 +46,6 @@ async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, country
     SELECT 
         posts.id, posts.description,
         extract(epoch from posts.created) * 1000 AS created,
-        INITCAP(industries.name) AS industry,
         extract(epoch from ap.approved) * 1000 AS approved,
         json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)) AS "subTopic",
         json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
@@ -58,7 +57,6 @@ async function getUserFeed(firstPersonId, { userId, topicId, subTopicId, country
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = subtopic_id
     INNER JOIN topics ON topics.id = subtopics.topic_id
-    INNER JOIN industries ON industry_id = industries.id
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id
@@ -106,13 +104,11 @@ async function getPendingPosts(userId) {
             'id', posts.id,
             'description', posts.description,
             'created', extract(epoch from posts.created) * 1000,
-            'industry', INITCAP(industries.name),
             'location', cities.name || ', ' || ISO_3_code.name,
             'postedBy', users.obj
         ) ORDER BY COALESCE(ap.approved, posts.created) DESC) AS posts
     FROM posts
     LEFT JOIN approved_posts AS ap ON ap.post_id = posts.id
-    INNER JOIN industries ON industry_id = industries.id
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id

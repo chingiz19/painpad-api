@@ -45,7 +45,6 @@ async function searchPosts(userId, topic, location, limit) {
     SELECT 
         posts.id, posts.description,
         extract(epoch from posts.created) * 1000 AS created,
-        INITCAP(industries.name) AS industry,
         extract(epoch from ap.approved) * 1000 AS approved,
         json_build_object('id', subtopics.id, 'description', subtopics.name, 'topicId', topics.id, 'topicName', INITCAP(topics.name)) AS "subTopic",
         json_build_object('cityId', cities.id, 'cityName', cities.name, 'stateId', states.id, 'stateName', states.name, 
@@ -57,7 +56,6 @@ async function searchPosts(userId, topic, location, limit) {
     INNER JOIN approved_posts AS ap ON ap.post_id = posts.id
     INNER JOIN subtopics ON subtopics.id = subtopic_id
     INNER JOIN topics ON topics.id = subtopics.topic_id
-    INNER JOIN industries ON industry_id = industries.id
     INNER JOIN cities ON city_id = cities.id
     INNER JOIN states ON states.id = cities.state_id
     INNER JOIN countries ON countries.id = states.country_id

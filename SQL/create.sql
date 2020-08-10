@@ -97,7 +97,7 @@ CREATE TABLE posts (
     id             SERIAL                          PRIMARY KEY,
     description    TEXT                            NOT NULL    UNIQUE,
     city_id        INTEGER                         NOT NULL REFERENCES cities(id),
-    industry_id    INTEGER                         NOT NULL REFERENCES industries(id),
+    topic_id       INTEGER                         NOT NULL REFERENCES topics(id),
     user_id        INTEGER                         REFERENCES users(id),
     created        TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );

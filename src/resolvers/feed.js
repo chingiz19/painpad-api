@@ -3,7 +3,7 @@ const Feed = require('../models/Feed');
 const User = require('../models/User');
 const Auth = require('../models/Auth');
 
-async function post(parent, { description, cityId, industryId }, { req }) {
+async function post(parent, { description, cityId, topicId }, { req }) {
     if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
 
     let userId = req.session.user.id;
@@ -11,7 +11,7 @@ async function post(parent, { description, cityId, industryId }, { req }) {
     let data = {
         user_id: userId,
         city_id: cityId,
-        industry_id: industryId,
+        topic_id: topicId,
         description
     }
 

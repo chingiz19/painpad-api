@@ -46,7 +46,7 @@ type Mutation {
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
   forgotPwd(email: String!): Boolean!
   resetPwd(newPwd: String!, token: String!): Boolean!
-  post(description: String!, cityId: ID!, industryId: ID!): Boolean!
+  post(description: String!, cityId: ID!, topicId: ID!): Boolean!
   sameHere(postId: ID!, add: Boolean!): Boolean!
   removePost(postId: ID!): Boolean!
   addOccupation(name: String!): ID!
@@ -119,7 +119,7 @@ type Post {
   description: String!
   postedBy: ShortUser!
   created: Float!
-  industry: String!
+  # industry: String!
   location: Location!
   subTopic: subTopic!
   approved: Float!
@@ -146,7 +146,7 @@ type PendingPost {
   description: String!
   postedBy: ShortUser!
   created: Float!
-  industry: String!
+  # industry: String!
   location: String!
 }
 

@@ -53,14 +53,14 @@ async function topicList() {
             'label', LOWER(name))
             ORDER BY LOWER(name)) AS topics
         FROM topics
-        WHERE LOWER(name) NOT LIKE 'other'
+        WHERE LOWER(name) NOT LIKE 'auto-detect'
     ),
     CTE_2 AS(
         SELECT json_agg(json_build_object(
             'value', id,
             'label', name)) AS topics
         FROM topics
-        WHERE LOWER(name) LIKE 'other'
+        WHERE LOWER(name) LIKE 'auto-detect'
     )
     
     SELECT * FROM CTE_1

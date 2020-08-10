@@ -92,7 +92,6 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
         const postUserOccupationId = post.user.occupationId;
         const postUserIndustryId = post.user.industryId;
-        const postIndustryId = post.industryId;
         const postCityId = post.cityId;
         const postStateId = post.stateId;
         const postCountryId = post.countryId;
@@ -103,10 +102,6 @@ async function approvePost(parent, { postId, subTopicId }, { req }) {
 
         if (currentIndustryId === postUserIndustryId) {
             postUserScore += MATCH_SCORES.USER_INDUSTRY;
-        }
-
-        if (currentIndustryId === postIndustryId) {
-            postUserScore += MATCH_SCORES.POST_INDUSTRY;
         }
 
         if (currentCityId === postCityId) {
