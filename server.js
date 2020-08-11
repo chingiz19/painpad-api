@@ -87,7 +87,8 @@ let options = {
       "http://api.painpad.co",
       "http://192.168.1.64:3000",
       "https://mvp1.painpad.co",
-      "https://painpad.co"
+      "https://painpad.co",
+      "https://www.painpad.co"
     ]
   }
 };
