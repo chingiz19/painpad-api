@@ -119,7 +119,6 @@ type Post {
   description: String!
   postedBy: ShortUser!
   created: Float!
-  # industry: String!
   location: Location!
   subTopic: subTopic!
   approved: Float!
@@ -146,9 +145,14 @@ type PendingPost {
   description: String!
   postedBy: ShortUser!
   created: Float!
-  # industry: String!
+  topic: Topic!
   location: String!
 }
+
+# type Topic {
+#   id: ID!
+#   name: String!
+# }
 
 type Pair {
   id: ID!
