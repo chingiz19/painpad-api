@@ -17,6 +17,7 @@ type Query {
   signin(email: String!, pwd: String!): Boolean!
   signout: Boolean!
   signS3(fileName: String!, fileType: String!): S3Response!
+  solutions(userId: ID, postId: ID): [Solution]!
   topicList: [TopicList]!
   topicStats(topicId: ID!): TopicStats!
   userProfile(userId: ID!): Profile!
@@ -41,6 +42,13 @@ type Mutation {
     industryId: ID
     profilePic: String
   ): Boolean!
+  addSolution(
+    postId: ID
+    logo: String
+    name: String
+    website: String
+    description: String
+  ):Boolean!
   follow(userIdToFollow: ID!): Boolean!
   unFollow(userIdToUnFollow: ID!): Boolean!
   changePwd(oldPwd: String!, newPwd: String!): Boolean!
@@ -48,7 +56,9 @@ type Mutation {
   resetPwd(newPwd: String!, token: String!): Boolean!
   post(description: String!, cityId: ID!, topicId: ID!): Boolean!
   sameHere(postId: ID!, add: Boolean!): Boolean!
+  like(solutionId: ID!, add: Boolean!): Boolean!
   removePost(postId: ID!): Boolean!
+  removeSolution(solutionId: ID!): Boolean!
   addOccupation(name: String!): ID!
   addIndustry(name: String!): ID!
   adminAddTopic(name: String!): ID!
@@ -100,6 +110,11 @@ type User {
   score: Int!
 }
 
+type shortTopic {
+  id: ID!
+  name: String!
+}
+
 type ShortUser {
   id: ID!
   firstName: String!
@@ -107,6 +122,14 @@ type ShortUser {
   profilePic: String!
   industry: String!
   occupation: String
+}
+
+type ShortPost{
+  id: Int!
+  description: String!
+  created: Float!
+  topic: shortTopic!
+  location: String!
 }
 
 type UserStats {
@@ -124,6 +147,7 @@ type Post {
   approved: Float!
   sameHere: Int!
   sameHered: Boolean!
+  solutionCnt: Int!
 }
 
 type RejectedPost {
@@ -148,11 +172,6 @@ type PendingPost {
   topic: Topic!
   location: String!
 }
-
-# type Topic {
-#   id: ID!
-#   name: String!
-# }
 
 type Pair {
   id: ID!
@@ -253,4 +272,16 @@ type Analytics{
 type TopicList{
   value: Int!
   label: String!
+}
+
+type Solution{
+  id: Int!
+  logo: String!
+  name: String!
+  website: String
+  description: String
+  likesCnt: Int!
+  postedBy: ShortUser!
+  postedTo: ShortPost!
+  liked: Boolean!
 }

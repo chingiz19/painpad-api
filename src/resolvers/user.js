@@ -219,8 +219,6 @@ async function addOccupation(parent, { name }, { req }) {
 }
 
 async function addIndustry(parent, { name }, { req }) {
-    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
-
     let select = await DB.selectFromWhere('industries', ['id'], [DB.whereObj('name', '=', name)]);
 
     if (select) throw new Error('Given industry already exists');
@@ -237,4 +235,51 @@ async function addIndustry(parent, { name }, { req }) {
     return result.id;
 }
 
-module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd, addOccupation, addIndustry };
+async function addSolution(parent, { postId, logo, name, website, description }, { req }) {
+    if (!Auth.isUserAuthorised(req)) throw new Auth.AuthenticationError();
+
+    let solutionUserId = req.session.user.id;
+
+    let data = {
+        post_id: postId,
+        user_id: solutionUserId,
+        logo: logo,
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        website: website && website.toLowerCase(),
+        description: description
+    }
+
+    let insertResult = await DB.insertValuesIntoTable('solutions', data);
+
+    if (!insertResult) throw new Error('Could not insert solution into DB');
+
+    const solutionUserResult = await User.getQuickInfo(solutionUserId);
+
+    if (!solutionUserResult) throw new Error('Error while getting solution-user data');
+
+    const postUserResult = await DB.selectFromWhere('posts', [`user_id`], postId);
+
+    if (!postUserResult) throw new Error('Error while getting post-user data');
+
+    const postUserId = postUserResult[0].user_id;
+
+    if (postUserId !== solutionUserId) {
+        User.incrementScore(solutionUserId, 5, "You deserved it - thanks for helping the community!");
+
+        let notificationData = {
+            header: 'New Solution',
+            subheader: name.toLowerCase(),
+            description: 'was suggested as a solution to your painful experience',
+            postId: postId,
+            action: `/posts/${postId}`,
+            icon: logo,
+            typeId: 6
+        }
+
+        Subscriptions.notify(postUserId, notificationData);
+    }
+
+    return true;
+}
+
+module.exports = { signin, signup, profile, signout, stats, changeProfile, follow, changePassword, unFollow, resetPwd, addOccupation, addIndustry, addSolution };

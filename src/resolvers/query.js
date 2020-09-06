@@ -26,6 +26,7 @@ module.exports = {
   signin: User.signin,
   signout: User.signout,
   signS3: AWS.signS3,
+  solutions: Feed.solutions,
   topicList: Topic.getTopicList,
   topicStats: Topic.getTopicStats,
   userPendingPosts: Feed.pendingPosts,

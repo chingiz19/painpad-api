@@ -15,10 +15,13 @@ module.exports = {
   changePwd: User.changePassword,
   follow: User.follow,
   forgotPwd: Email.resetPassword,
+  like: Feed.like,
   post: Feed.post,
   removePost: Feed.removePost,
+  removeSolution: Feed.removeSolution,
   resetPwd: User.resetPwd,
   sameHere: Feed.sameHere,
+  addSolution: User.addSolution,
   signup: User.signup,
   unFollow: User.unFollow
 };
