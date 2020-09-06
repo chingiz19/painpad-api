@@ -140,6 +140,24 @@ CREATE TABLE follows (
     follows    INTEGER     REFERENCES users(id)
 );
 
+CREATE TABLE solutions (
+    id              SERIAL      PRIMARY KEY,
+    post_id         INTEGER     REFERENCES posts(id),     
+    user_id         INTEGER     REFERENCES users(id),
+    logo            TEXT        NOT NULL    DEFAULT 'https://painpad-profile-pictures.s3-us-west-1.amazonaws.com/painpad_default.jpg',
+    name            TEXT        NOT NULL,
+    website         TEXT,
+    description     TEXT,
+    created         TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE likes (
+    id             SERIAL      PRIMARY KEY,
+    solution_id        INTEGER     REFERENCES solutions(id),
+    user_id        INTEGER     REFERENCES users(id),
+    created         TIMESTAMP WITHOUT TIME ZONE     NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE notification_types (
     id                 SERIAL      PRIMARY KEY,
     background_color   TEXT        NOT NULL,
@@ -188,7 +206,8 @@ INSERT INTO notification_types(id, background_color, is_user_icon, description, 
 (2, '#3FA5F899', TRUE, 'Same Here', ''),
 (3, '#F4E94B99', FALSE, 'Reward', 'notifReward'),
 (4, '#c6f1e7', FALSE, 'Post Approved', 'postApproved'),
-(5, '#ffcbcb', FALSE, 'Post Rejected', 'postRejected');
+(5, '#ffcbcb', FALSE, 'Post Rejected', 'postRejected'),
+(6, '#c6f1e7', TRUE, 'New Solution', '');
 
 
 
