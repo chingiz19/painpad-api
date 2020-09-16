@@ -284,4 +284,5 @@ type Solution{
   postedBy: ShortUser!
   postedTo: ShortPost!
   liked: Boolean!
+  created: Float!
 }
