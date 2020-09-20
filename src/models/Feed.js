@@ -350,7 +350,7 @@ async function getSolutions(firstPersonId, {userId, postId}) {
         FROM likes
         GROUP BY solution_id) AS likes ON likes.solution_id = S.id
     ${whereStr}
-    ORDER BY likes.count DESC`;
+    ORDER BY likes.count`;
 
     let result = await DB.incubate(query, params);
 
